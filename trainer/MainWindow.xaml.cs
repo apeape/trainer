@@ -17,6 +17,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using WindowsInput;
 
 namespace trainer
 {
@@ -25,12 +26,14 @@ namespace trainer
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<TrainerOption> Options = new List<TrainerOption>();
+        public Dictionary<string, TrainerOption> Options = new Dictionary<string, TrainerOption>();
+        //List<TrainerOption> Options = new List<TrainerOption>();
         ProcessMemory GameMemory = new ProcessMemory();
         bool GameProcessFound = false;
         bool TrainerExiting = false;
         uint GameBaseAddress;
         Thread FindGameWindow;
+        MouseSimulator Mouse = new MouseSimulator();
 
         public MainWindow()
         {
@@ -178,13 +181,23 @@ namespace trainer
         //const double SpeedHackAccel = 0.9;
         //byte[] SpeedHackOn = new byte[] { 0xDC, 0x0D, 0x88, 0x84, 0x31, 0x01 };
         //byte[] SpeedHackOff = new byte[] { 0xDC, 0x0D, 0xF0, 0x82, 0x31, 0x01 };
+        object SpeedHackLock = new object();
+        bool SpeedHackDone = false;
         private void SpeedHack_HotkeyPressed()
         {
-            // read orig speed value offset
-            uint SpeedPtr = GameMemory.ReadU32(GameBaseAddress + 0x23FBA);
-            SpeedPtr += 0x198;
-            GameMemory.WriteU32(GameBaseAddress + 0x23FBa, SpeedPtr);
-            //GameMemory.Write(GameBaseAddress + 0x23FB8, ref SpeedHackOn);
+            lock (SpeedHackLock)
+            {
+                if (!SpeedHackDone)
+                {
+                    SpeedHackDone = true;
+                    // read orig speed value offset
+                    uint SpeedPtr = GameMemory.ReadU32(GameBaseAddress + 0x23FBA);
+                    SpeedPtr += 0x198;
+                    GameMemory.WriteU32(GameBaseAddress + 0x23FBa, SpeedPtr);
+
+                    Options["Speedhack"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+                }
+            }
         }
 
         //const float DefaultJumpHeight = -0.32f;
@@ -195,24 +208,47 @@ namespace trainer
         // jump steering patch
         //byte[] MegaJumpSteeringOn = new byte[] { 0xDC, 0x0D, 0x20, 0x84, 0x31, 0x01 };
         //byte[] MegaJumpSteeringOff = new byte[] { 0xDC, 0x0D, 0x48, 0x84, 0x31, 0x01 };
+        object MegaJumpLock = new object();
+        bool MegaJumpDone = false;
         private void MegaJump_HotkeyPressed()
         {
-            //GameMemory.Write(GameBaseAddress + 0x23F26, ref MegaJumpOn);
-            uint JumpHeightPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F28);
-            JumpHeightPtr -= 0x150;
-            GameMemory.WriteU32(GameBaseAddress + 0x23F28, JumpHeightPtr);
-            //GameMemory.Write(GameBaseAddress + 0x23F90, ref MegaJumpSteeringOn);
-            uint JumpSteeringPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F92);
-            JumpSteeringPtr -= 0x28;
-            GameMemory.WriteU32(GameBaseAddress + 0x23F92, JumpSteeringPtr);
+            lock (MegaJumpLock)
+            {
+                if (!MegaJumpDone) // run once
+                {
+                    MegaJumpDone = true;
+
+                    //GameMemory.Write(GameBaseAddress + 0x23F26, ref MegaJumpOn);
+                    uint JumpHeightPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F28);
+                    JumpHeightPtr -= 0x150;
+                    GameMemory.WriteU32(GameBaseAddress + 0x23F28, JumpHeightPtr);
+                    //GameMemory.Write(GameBaseAddress + 0x23F90, ref MegaJumpSteeringOn);
+                    uint JumpSteeringPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F92);
+                    JumpSteeringPtr -= 0x28;
+                    GameMemory.WriteU32(GameBaseAddress + 0x23F92, JumpSteeringPtr);
+
+                    Options["Megajump"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+                }
+            }
         }
 
+        object SuperNadeRangeLock = new object();
+        bool SuperNadeRangeDone = false;
         private void SuperNadeRange_HotkeyPressed()
         {
-            // read orig speed value offset
-            uint NadeRangePtr = GameMemory.ReadU32(GameBaseAddress + 0x21FD4);
-            NadeRangePtr += 0xB0;
-            GameMemory.WriteU32(GameBaseAddress + 0x21FD4, NadeRangePtr);
+            lock (SuperNadeRangeLock)
+            {
+                if (!SuperNadeRangeDone)
+                {
+                    SuperNadeRangeDone = true;
+                    // read orig speed value offset
+                    uint NadeRangePtr = GameMemory.ReadU32(GameBaseAddress + 0x21FD4);
+                    NadeRangePtr += 0xB0;
+                    GameMemory.WriteU32(GameBaseAddress + 0x21FD4, NadeRangePtr);
+
+                    Options["SuperNadeRange"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+                }
+            }
         }
 
         private void EnableAll_HotkeyPressed()
@@ -227,6 +263,33 @@ namespace trainer
             MegaJump_HotkeyPressed();
             MultiJump_HotkeyPressed();
             System.Console.Beep();
+        }
+
+        object NadeSpamLock = new object();
+        bool NadeSpamInProgress = false;
+        /// <summary>
+        /// clicks the mouse rapidly to spam nades
+        /// </summary>
+        private void NadeSpammer()
+        {
+            //if (Process.f.MainWindowTitle == "Ace of Spades")
+            if (NadeSpamInProgress) return; // to avoid the clicks building up
+            lock (NadeSpamLock) // prevent more than 1 of these from running at a time
+            {
+                new Thread(delegate()
+                {
+                    NadeSpamInProgress = true;
+                    for (int i = 0; i < 15; i++)
+                    {
+                        Mouse.LeftButtonDown();
+                        Thread.Sleep(25);
+                        Mouse.LeftButtonUp();
+                        Thread.Sleep(25);
+                    }
+                    NadeSpamInProgress = false;
+                }).Start();
+                //System.Console.Beep();
+            }
         }
 
         byte[] MultiJumpOn = new byte[] { 0x90, 0x90 };
@@ -254,27 +317,30 @@ namespace trainer
                 TrainerOption Multijump = new TrainerOption(Keys.F9, MultiJump_HotkeyPressed, windowHandle);
                 TrainerOption SuperNadeRange = new TrainerOption(Keys.F10, SuperNadeRange_HotkeyPressed, windowHandle);
                 TrainerOption EnableAll = new TrainerOption(Keys.F11, EnableAll_HotkeyPressed, windowHandle);
+
+                TrainerOption NadeSpam = new TrainerOption(Keys.Z, NadeSpammer, windowHandle);
                 
 
-                Options.Add(GodMode);
-                Options.Add(InfAmmo);
-                Options.Add(RapidfireGun);
-                Options.Add(NoRecoil);
-                Options.Add(RapidfireNades);
-                Options.Add(NoFog);
-                Options.Add(Speedhack);
-                Options.Add(Megajump);
-                Options.Add(Multijump);
-                Options.Add(SuperNadeRange);
-                Options.Add(EnableAll);
+                Options.Add("GodMode", GodMode);
+                Options.Add("InfAmmo", InfAmmo);
+                Options.Add("RapidfireGun", RapidfireGun);
+                Options.Add("NoRecoil", NoRecoil);
+                Options.Add("RapidfireNades", RapidfireNades);
+                Options.Add("NoFog", NoFog);
+                Options.Add("Speedhack", Speedhack);
+                Options.Add("Megajump", Megajump);
+                Options.Add("Multijump", Multijump);
+                Options.Add("SuperNadeRange", SuperNadeRange);
+                Options.Add("EnableAll", EnableAll);
+                Options.Add("NadeSpam", NadeSpam);
             });
         }
 
         // TODO: support toggling hotkey and trainer options
         public class TrainerOption
         {
-            bool ToggleState { get; set; }
-            HotKey Hotkey;
+            public bool ToggleState { get; set; }
+            public HotKey Hotkey { get; set; }
 
             // default to hotkey OFF
             public TrainerOption(Keys KeyCode, Action HotkeyPressed, IntPtr WindowHandle)
@@ -287,7 +353,7 @@ namespace trainer
                 Hotkey = new HotKey(Modifier, KeyCode, WindowHandle);
                 Hotkey.HotKeyPressed += (blargh) => HotkeyPressed();
 
-                this.ToggleState           = false;
+                this.ToggleState = false;
             }
         }
     }
