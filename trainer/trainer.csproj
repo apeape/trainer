@@ -112,6 +112,7 @@
     <Content Include="BASSMOD.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="mute_tiny.png" />
     <Resource Include="heartspin_light.gif" />
     <Resource Include="sonicmiles3_.gif" />
     <Resource Include="Peggle.ico" />

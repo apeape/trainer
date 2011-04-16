@@ -175,5 +175,10 @@
         <Image Height="16" HorizontalAlignment="Right" Margin="0" 
                Stretch="None" VerticalAlignment="Bottom" Width="67"
                Source="/trainer;component/tiny-monkey.png" />
+        <Image x:Name="Mute" UseLayoutRounding="True" Source="/trainer;component/mute_tiny.png"
+               Stretch="None" MouseLeftButtonUp="Mute_MouseLeftButtonUp"
+               VerticalAlignment="Top" HorizontalAlignment="Right"
+               Width="40" Height="40" />
+
     </Grid>
 </Window>

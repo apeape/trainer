@@ -356,5 +356,13 @@ namespace trainer
                 this.ToggleState = false;
             }
         }
+
+        private void Mute_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // sometimes this doesnt stop correctly
+            BassMOD.BASSMOD_MusicStop();
+            BassMOD.BASSMOD_MusicStop();
+            BassMOD.BASSMOD_MusicStop();
+        }
     }
 }
