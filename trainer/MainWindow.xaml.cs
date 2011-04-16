@@ -28,6 +28,7 @@ namespace trainer
         List<TrainerOption> Options = new List<TrainerOption>();
         ProcessMemory GameMemory = new ProcessMemory();
         bool GameProcessFound = false;
+        bool TrainerExiting = false;
         uint GameBaseAddress;
         Thread FindGameWindow;
 
@@ -62,12 +63,14 @@ namespace trainer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            TrainerExiting = true;
+
             // stop bassmod
             BassMOD.BASSMOD_MusicStop();
             BassMOD.BASSMOD_Free();
-
+            
             if (FindGameWindow.ThreadState == System.Threading.ThreadState.Running)
-                FindGameWindow.Interrupt();
+                FindGameWindow.Abort();
         }
 
         /// <summary>
@@ -79,7 +82,7 @@ namespace trainer
 
             try
             {
-                while (!GameProcessFound)
+                while (!GameProcessFound && !TrainerExiting)
                 {
                     // find game window
                     gameProcess = Process.GetProcessesByName("client")
@@ -93,7 +96,7 @@ namespace trainer
                         {
                             this.Title = this.Title + " - game found!";
                         });
-                            
+
                         // stop music and wpf animations
                         BassMOD.BASSMOD_MusicStop();
                         ((Storyboard)this.Resources["LogoZoom"]).Stop();
@@ -108,6 +111,8 @@ namespace trainer
                         GameProcessFound = true;
                         break;
                     }
+                    else
+                        Thread.Sleep(1000);
                 }
             }
             catch (ThreadInterruptedException)
@@ -148,15 +153,14 @@ namespace trainer
         }
 
         // wip
-        byte[] RapidfireNadesOn1 = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-        byte[] RapidfireNadesOff1 = new byte[] { 0x0F, 0x85, 0x94, 0x00, 0x00, 0x00 };
+        //byte[] RapidfireNadesOn1 = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+        //byte[] RapidfireNadesOff1 = new byte[] { 0x0F, 0x85, 0x94, 0x00, 0x00, 0x00 };
 
-        byte[] RapidfireNadesOn2 = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-        byte[] RapidfireNadesOff2 = new byte[] { };
+        byte[] RapidfireNadesOn1 = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+        byte[] RapidfireNadesOff1 = new byte[] { 0x89, 0x0D, 0x9C, 0xBC, 0x7D, 0x03 };
         private void RapidfireNades_HotkeyPressed()
         {
-            //GameMemory.Write(GameBaseAddress + 0x2548E, ref RapidfireNadesOn1);
-            //GameMemory.Write(GameBaseAddress + 0x, ref RapidfireNadesOn2);
+            GameMemory.Write(GameBaseAddress + 0x254D3, ref RapidfireNadesOn1);
         }
 
         byte[] NoFogOn = new byte[2048];
