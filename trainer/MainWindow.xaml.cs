@@ -176,25 +176,57 @@ namespace trainer
 
         //const double DefaultMovementAccel = 0.1000000014901161;
         //const double SpeedHackAccel = 0.9;
-        byte[] SpeedHackOn = new byte[] { 0xDC, 0x0D, 0x88, 0x84, 0x31, 0x01 };
-        byte[] SpeedHackOff = new byte[] { 0xDC, 0x0D, 0xF0, 0x82, 0x31, 0x01 };
+        //byte[] SpeedHackOn = new byte[] { 0xDC, 0x0D, 0x88, 0x84, 0x31, 0x01 };
+        //byte[] SpeedHackOff = new byte[] { 0xDC, 0x0D, 0xF0, 0x82, 0x31, 0x01 };
         private void SpeedHack_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x23FB8, ref SpeedHackOn);
+            // read orig speed value offset
+            uint SpeedPtr = GameMemory.ReadU32(GameBaseAddress + 0x23FBA);
+            SpeedPtr += 0x198;
+            GameMemory.WriteU32(GameBaseAddress + 0x23FBa, SpeedPtr);
+            //GameMemory.Write(GameBaseAddress + 0x23FB8, ref SpeedHackOn);
         }
 
         //const float DefaultJumpHeight = -0.32f;
         //const float MegaJumpHeight = -0.9f;
         // jump height patch
-        byte[] MegaJumpOn = new byte[] { 0xD9, 0x05, 0xF0, 0x83, 0x31, 0x01 };
-        byte[] MegaJumpOff = new byte[] { 0xD9, 0x05, 0x40, 0x85, 0x31, 0x01 };
+        //byte[] MegaJumpOn = new byte[] { 0xD9, 0x05, 0xF0, 0x83, 0x31, 0x01 };
+        //byte[] MegaJumpOff = new byte[] { 0xD9, 0x05, 0x40, 0x85, 0x31, 0x01 };
         // jump steering patch
-        byte[] MegaJumpSteeringOn = new byte[] { 0xDC, 0x0D, 0x20, 0x84, 0x31, 0x01 };
-        byte[] MegaJumpSteeringOff = new byte[] { 0xDC, 0x0D, 0x48, 0x84, 0x31, 0x01 };
+        //byte[] MegaJumpSteeringOn = new byte[] { 0xDC, 0x0D, 0x20, 0x84, 0x31, 0x01 };
+        //byte[] MegaJumpSteeringOff = new byte[] { 0xDC, 0x0D, 0x48, 0x84, 0x31, 0x01 };
         private void MegaJump_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x23F26, ref MegaJumpOn);
-            GameMemory.Write(GameBaseAddress + 0x23F90, ref MegaJumpSteeringOn);
+            //GameMemory.Write(GameBaseAddress + 0x23F26, ref MegaJumpOn);
+            uint JumpHeightPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F28);
+            JumpHeightPtr -= 0x150;
+            GameMemory.WriteU32(GameBaseAddress + 0x23F28, JumpHeightPtr);
+            //GameMemory.Write(GameBaseAddress + 0x23F90, ref MegaJumpSteeringOn);
+            uint JumpSteeringPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F92);
+            JumpSteeringPtr -= 0x28;
+            GameMemory.WriteU32(GameBaseAddress + 0x23F92, JumpSteeringPtr);
+        }
+
+        private void SuperNadeRange_HotkeyPressed()
+        {
+            // read orig speed value offset
+            uint NadeRangePtr = GameMemory.ReadU32(GameBaseAddress + 0x21FD4);
+            NadeRangePtr += 0xB0;
+            GameMemory.WriteU32(GameBaseAddress + 0x21FD4, NadeRangePtr);
+        }
+
+        private void EnableAll_HotkeyPressed()
+        {
+            GodMode_HotkeyPressed();
+            InfAmmo_HotkeyPressed();
+            RapidfireGun_HotkeyPressed();
+            NoRecoil_HotkeyPressed();
+            RapidfireNades_HotkeyPressed();
+            NoFog_HotkeyPressed();
+            SpeedHack_HotkeyPressed();
+            MegaJump_HotkeyPressed();
+            MultiJump_HotkeyPressed();
+            System.Console.Beep();
         }
 
         byte[] MultiJumpOn = new byte[] { 0x90, 0x90 };
@@ -220,6 +252,9 @@ namespace trainer
                 TrainerOption Speedhack = new TrainerOption(Keys.F7, SpeedHack_HotkeyPressed, windowHandle);
                 TrainerOption Megajump = new TrainerOption(Keys.F8, MegaJump_HotkeyPressed, windowHandle);
                 TrainerOption Multijump = new TrainerOption(Keys.F9, MultiJump_HotkeyPressed, windowHandle);
+                TrainerOption SuperNadeRange = new TrainerOption(Keys.F10, SuperNadeRange_HotkeyPressed, windowHandle);
+                TrainerOption EnableAll = new TrainerOption(Keys.F11, EnableAll_HotkeyPressed, windowHandle);
+                
 
                 Options.Add(GodMode);
                 Options.Add(InfAmmo);
@@ -230,6 +265,8 @@ namespace trainer
                 Options.Add(Speedhack);
                 Options.Add(Megajump);
                 Options.Add(Multijump);
+                Options.Add(SuperNadeRange);
+                Options.Add(EnableAll);
             });
         }
 
