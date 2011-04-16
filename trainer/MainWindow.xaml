@@ -1,0 +1,160 @@
+﻿<Window x:Class="trainer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ace of spades 0.26 trainer" Height="314" Width="347"
+        Loaded="Window_Loaded" Closing="Window_Closing"
+        Icon="/trainer;component/Peggle.ico" ResizeMode="CanMinimize"
+        xmlns:local="clr-namespace:trainer">
+    <Window.Resources>
+        <Storyboard x:Key="LogoZoom">
+            <DoubleAnimation
+                Storyboard.TargetName="Logo"
+                Storyboard.TargetProperty="Width"
+                From="235" To="150" Duration="0:0:0.5" 
+                AutoReverse="True" 
+                RepeatBehavior="Forever">
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="LogoRotate">
+            <DoubleAnimation
+                Storyboard.TargetName="LogoRotation"
+                Storyboard.TargetProperty="Angle"
+                From="0" To="360" Duration="0:0:20" 
+                AutoReverse="False" 
+                RepeatBehavior="Forever"
+                AccelerationRatio="0.7" DecelerationRatio="0.3">
+                <DoubleAnimation.EasingFunction>
+                    <BounceEase Bounces="2" EasingMode="EaseinOut" 
+                                Bounciness="1.8" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="BackgroundRotate">
+            <DoubleAnimation
+                Storyboard.TargetName="BackgroundRotation"
+                Storyboard.TargetProperty="Angle"
+                From="0" To="-360" Duration="0:0:20" 
+                AutoReverse="False" 
+                RepeatBehavior="Forever">
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+    <Grid Background="#58519A" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel x:Name="BackgroundTile" Orientation="Horizontal" Width="800" Height="700" Margin="-150,-150,-150,-150" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel.LayoutTransform>
+                <RotateTransform x:Name="BackgroundRotation" Angle="0"/>
+            </StackPanel.LayoutTransform>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/sonicmiles3_.gif" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+        </StackPanel>
+        <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/heartspin_light.gif" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/heartspin_light.gif" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/heartspin_light.gif" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Image Stretch="None" local:ImageBehavior.AnimatedSource="/trainer;component/heartspin_light.gif" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Image x:Name="Logo" Height="300" HorizontalAlignment="Center" Margin="0,0" Stretch="Uniform"
+            VerticalAlignment="Center" Width="205" Source="/trainer;component/PPP.png" StretchDirection="Both">
+            <Image.LayoutTransform>
+                <RotateTransform x:Name="LogoRotation" Angle="0"/>
+            </Image.LayoutTransform>
+        </Image>
+        <TextBlock Height="135" HorizontalAlignment="Left" Name="OptionsText" VerticalAlignment="Bottom" 
+                   Width="325" Foreground="White" TextWrapping="Wrap"
+                   UseLayoutRounding="True" FontSize="14" Padding="10">
+            <TextBlock.Effect>
+                <DropShadowEffect
+                  ShadowDepth="4"
+                  Direction="315"
+                  Color="#FF930065"
+                  Opacity="1"
+                  BlurRadius="6" RenderingBias="Quality" />
+            </TextBlock.Effect>
+            f1 - god mode<LineBreak/>
+            f2 - inf ammo<LineBreak/>
+            f3 - rapid fire gun<LineBreak/>
+            f4 - no recoil<LineBreak/>
+            f5 - rapid fire nades (doesn't work yet)<LineBreak/>
+            f6 - no fog<LineBreak/>
+        </TextBlock>
+        <Image Height="16" HorizontalAlignment="Right" Margin="0" 
+               Stretch="None" VerticalAlignment="Bottom" Width="67"
+               Source="/trainer;component/tiny-monkey.png" />
+    </Grid>
+</Window>

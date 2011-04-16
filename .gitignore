@@ -1,0 +1,9 @@
+obj/
+bin/
+*.suo
+*.user
+Log/
+log/
+*.db
+*.Debug.cachefile
+*.cachefile
