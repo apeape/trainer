@@ -135,7 +135,7 @@
                 <RotateTransform x:Name="LogoRotation" Angle="0"/>
             </Image.LayoutTransform>
         </Image>
-        <TextBlock Height="150" HorizontalAlignment="Left" Name="OptionsText" VerticalAlignment="Bottom" 
+        <TextBlock Height="185" HorizontalAlignment="Left" Name="OptionsText" VerticalAlignment="Bottom" 
                    Width="325" Foreground="White" TextWrapping="Wrap"
                    UseLayoutRounding="True" FontSize="14" Padding="10">
             <TextBlock.Effect>
@@ -152,7 +152,9 @@
             f4 - no recoil<LineBreak/>
             f5 - rapid fire nades<LineBreak/>
             f6 - no fog<LineBreak/>
-            <!--f7 - speed hack/megajump<LineBreak/>-->
+            f7 - speed hack<LineBreak/>
+            f8 - mega jump<LineBreak/>
+            f9 - multi jump<LineBreak/>
         </TextBlock>
         <Image Height="16" HorizontalAlignment="Right" Margin="0" 
                Stretch="None" VerticalAlignment="Bottom" Width="67"

@@ -98,6 +98,10 @@ namespace trainer
                         });
 
                         // stop music and wpf animations
+
+                        // sometimes this doesnt stop correctly
+                        BassMOD.BASSMOD_MusicStop();
+                        BassMOD.BASSMOD_MusicStop();
                         BassMOD.BASSMOD_MusicStop();
                         ((Storyboard)this.Resources["LogoZoom"]).Stop();
                         ((Storyboard)this.Resources["LogoRotate"]).Stop();
@@ -163,11 +167,32 @@ namespace trainer
             GameMemory.Write(GameBaseAddress + 0x254D3, ref RapidfireNadesOn1);
         }
 
-        byte[] NoFogOn = new byte[2048];
-        byte[] NoFogOff = new byte[2048];
+        byte[] NoFogOn = new byte[1024];
+        byte[] NoFogOff = new byte[1024];
         private void NoFog_HotkeyPressed()
         {
             GameMemory.Write(GameBaseAddress + 0x628D0, ref NoFogOn);
+        }
+
+        const double DefaultMovementAccel = 0.1000000014901161;
+        const double SpeedHackAccel = 0.9;
+        private void SpeedHack_HotkeyPressed()
+        {
+            GameMemory.WriteF64(GameBaseAddress + 0x38448, SpeedHackAccel);
+        }
+
+        const float DefaultJumpHeight = -0.32f;
+        const float MegaJumpHeight = -0.9f;
+        private void MegaJump_HotkeyPressed()
+        {
+            GameMemory.WriteF32(GameBaseAddress + 0x38540, MegaJumpHeight);
+        }
+
+        byte[] MultiJumpOn = new byte[] { 0x90, 0x90 };
+        byte[] MultiJumpOff = new byte[] { 0x75, 0x0F };
+        private void MultiJump_HotkeyPressed()
+        {
+            GameMemory.Write(GameBaseAddress + 0x23A8A, ref MultiJumpOn);
         }
 #endregion
 
@@ -183,6 +208,9 @@ namespace trainer
                 TrainerOption NoRecoil = new TrainerOption(Keys.F4, NoRecoil_HotkeyPressed, windowHandle);
                 TrainerOption RapidfireNades = new TrainerOption(Keys.F5, RapidfireNades_HotkeyPressed, windowHandle);
                 TrainerOption NoFog = new TrainerOption(Keys.F6, NoFog_HotkeyPressed, windowHandle);
+                TrainerOption Speedhack = new TrainerOption(Keys.F7, SpeedHack_HotkeyPressed, windowHandle);
+                TrainerOption Megajump = new TrainerOption(Keys.F8, MegaJump_HotkeyPressed, windowHandle);
+                TrainerOption Multijump = new TrainerOption(Keys.F9, MultiJump_HotkeyPressed, windowHandle);
 
                 Options.Add(GodMode);
                 Options.Add(InfAmmo);
@@ -190,6 +218,9 @@ namespace trainer
                 Options.Add(NoRecoil);
                 Options.Add(RapidfireNades);
                 Options.Add(NoFog);
+                Options.Add(Speedhack);
+                Options.Add(Megajump);
+                Options.Add(Multijump);
             });
         }
 
