@@ -1,0 +1,1281 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BassMOD.Net</name>
+    </assembly>
+    <members>
+        <member name="T:Un4seen.BassMOD.BassMOD">
+            <summary>
+            BassMOD.NET API wrapper for BASSMOD.DLL
+            <para>Requires: bassmod.dll - BASSMOD Audio Library - available @ www.un4seen.com</para>
+            </summary>
+            <remarks>
+            <para>BASSMOD is an MOD only audio library for use in Windows and MacOSX software. It's purpose is to provide the most powerful and efficient (yet easy to use),
+            MOD music functions. All in a tiny DLL, under 50KB in size.</para>
+            </remarks>
+        </member>
+        <member name="F:Un4seen.BassMOD.BassMOD.BASSMODVERSION">
+            <summary>
+            Current BASS version (without minor revision).
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BassMOD.FALSE">
+            <summary>
+            The BASS way to say FALSE = 0.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BassMOD.TRUE">
+            <summary>
+            The BASS way to say TRUE = 1.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BassMOD.ERROR">
+            <summary>
+            The BASS way to say ERROR = -1.
+            </summary>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_Init(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Initializes an output device
+            </summary>
+            <param name="device">The device to use... 0 = first, -1 = default, -2 = no sound, -3 = decode only. 
+            <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescription(System.Int32)"/> can be used to get the total number of devices
+            </param>
+            <param name="freq">Output sample rate</param>
+            <param name="flags">Any combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSInit"/>):
+            <list type="table">
+            <item><term>BASS_DEVICE_8BITS</term><description>Use 8-bit resolution, else 16-bit.</description></item>
+            <item><term>BASS_DEVICE_MONO</term><description>Use mono, else stereo.</description></item>
+            <item><term>BASS_DEVICE_NOSYNC</term><description>Disable synchronizers. If you are not using any syncs, then you may as well use this flag to save a little CPU time. This is automatic when using the "decode only" device.</description></item>
+            </list>
+            </param>
+            <returns>If the device was successfully initialized, TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>This function must be successfully called before using any MOD music functions, except <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/>, <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescription(System.Int32)"/> and <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetVersion"/>.</para>
+            <para>When using the "decode only" device (device = -3), BASSMOD only decodes the sample data (via <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicDecode(System.IntPtr,System.Int32)"/>), without playing it. 
+            This allows the data to be outputted in any way wanted, for example, writing to disk. As no playback (and therefore syncing too) is performed, no decoding or syncing threads are created when using this "device".</para>
+            </remarks>
+            <example>
+            Initialize BASSMOD, falling back to no sound if no device is available.
+            <code>
+            // try initializing the default device, at 44100hz stereo 16-bits
+            if ( !BassMOD.BASSMOD_Init(-1, 44100, 0, 0, null) )
+            {
+            	// couldn't initialize device, so use "no sound"
+            	BassMOD.BASSMOD_Init(0, 44100, 0, 0, null);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_Init(System.Int32,System.Int32,Un4seen.BassMOD.BASSInit)">
+            <summary>
+            Initializes an output device
+            </summary>
+            <param name="device">The device to use... 0 = first, -1 = default, -2 = no sound, -3 = decode only. 
+            <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescription(System.Int32)"/> can be used to get the total number of devices
+            </param>
+            <param name="freq">Output sample rate</param>
+            <param name="flags">Any combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSInit"/>):
+            <list type="table">
+            <item><term>BASS_DEVICE_8BITS</term><description>Use 8-bit resolution, else 16-bit.</description></item>
+            <item><term>BASS_DEVICE_MONO</term><description>Use mono, else stereo.</description></item>
+            <item><term>BASS_DEVICE_NOSYNC</term><description>Disable synchronizers. If you are not using any syncs, then you may as well use this flag to save a little CPU time. This is automatic when using the "decode only" device.</description></item>
+            </list>
+            </param>
+            <returns>If the device was successfully initialized, TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>This function must be successfully called before using any MOD music functions, except <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/>, <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescription(System.Int32)"/> and <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetVersion"/>.</para>
+            <para>When using the "decode only" device (device = -3), BASSMOD only decodes the sample data (via <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicDecode(System.IntPtr,System.Int32)"/>), without playing it. 
+            This allows the data to be outputted in any way wanted, for example, writing to disk. As no playback (and therefore syncing too) is performed, no decoding or syncing threads are created when using this "device".</para>
+            </remarks>
+            <example>
+            Initialize BASSMOD, falling back to no sound if no device is available.
+            <code>
+            // try initializing the default device, at 44100hz stereo 16-bits
+            if ( !BassMOD.BASSMOD_Init(-1, 44100, 0, 0, null) )
+            {
+            	// couldn't initialize device, so use "no sound"
+            	BassMOD.BASSMOD_Init(0, 44100, 0, 0, null);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode">
+            <summary>
+            Retrieves the error code for the most recent BASSMOD function call in the current thread.
+            </summary>
+            <returns>If no error occured during the last BASSMOD function call then BASS_OK is returned, else one of the <see cref="T:Un4seen.BassMOD.BASSErrorCode"/> values is returned. See the function description for an explanation of what the error code means.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_Free">
+            <summary>
+            Frees all resources used by the output device, including all it's MOD musics.
+            </summary>
+            <returns>If successful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>This function should be called for all initialized devices before your program exits. It's not necessary to individually free the musics as these are all automatically freed by this function.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetVersion">
+            <summary>
+            Retrieves the version number of the BASSMOD.DLL that is loaded.
+            </summary>
+            <returns>The BASSMOD version. For example, 0x02000000 (hex), would be version 2.0.0.0.</returns>
+            <remarks>There is no guarantee that a previous or future version of BASSMOD supports all the BASSMOD functions that you are using, so you should always use this function to make sure the correct version is loaded.
+            It is safe to assume that future minor revisions (indicated in the LOWORD) will be fully compatible.
+            <para>You might use the global constant <see cref="F:Un4seen.BassMOD.BassMOD.BASSMODVERSION"/> to check the major revision.</para>
+            </remarks>
+            <example>
+            Checking the major version only:
+            <code>
+            if ( Utils.HighWord(BassMOD.BASSMOD_GetVersion()) != BassMOD.BASSMODVERSION )
+            {
+            	MessageBox.Show( this, "Wrong BassMOD Version!" );
+            }
+            </code>
+            Checking the full version:
+            <code>
+            // GetVersion(low, high) == MakeLong(low, high)?
+            if (BassMOD.BASSMOD_GetVersion() &lt; Utils.MakeLong(0x0000,0x0200))
+            {
+            	MessageBox.Show( this, "Wrong BassMOD Version!" );
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescriptionPtr(System.Int32)">
+            <summary>
+            Internally used.
+            </summary>
+            <param name="device"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescription(System.Int32)">
+            <summary>
+            Retrieves the text description of a device.
+            </summary>
+            <param name="device">The device to get the description of... 0 = first.</param>
+            <returns>If succesful, then the description is returned, else NULL is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>This function can be used to enumerate the available devices for a setup dialog. Device 0 is always the "no sound" device, so if you only want to list real devices, you should start at device 1.</remarks>
+            <example>
+            List all available devices:
+            <code>
+            int count = 0;
+            string devName = "";
+            while (devName != null)
+            {
+            	devName = BassMOD.BASSMOD_GetDeviceDescription(count);
+            	count++;
+            	if (devName != null)
+            		Console.WriteLine( devName );
+            }
+            </code>
+            Or use one of the overloads for more convenience (see <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescriptions"/>).
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescriptions">
+            <summary>
+            Returns all available device names.
+            </summary>
+            <returns>An array of strings representing the available devices.</returns>
+            <remarks>Uses <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescription(System.Int32)"/> internally.
+            <para>The index of the returned descriptions equals the device-id, which might be used with <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_Init(System.Int32,System.Int32,System.Int32)"/>.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceCount">
+            <summary>
+            Returns the total number of available devices.
+            </summary>
+            <returns>Number of real devices available.</returns>
+            <remarks>Uses <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetDeviceDescription(System.Int32)"/> internally.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetCPU">
+            <summary>
+            Retrieves the current CPU usage of BASSMOD.
+            </summary>
+            <returns>The BASSMOD CPU usage as a percentage of total CPU time.</returns>
+            <remarks>
+            <para>This function includes the time taken to decode and mix the MOD music (HMUSIC) channels during playback.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_SetVolume(System.Int32)">
+            <summary>
+            Sets the output master volume.
+            </summary>
+            <param name="volume">The volume level... 0 (min) - 100(max).</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>This function affects the volume level of all applications using the same output device. If you wish to only affect the level of your app's sounds, <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetVolume(System.Int32)"/> should be used instead.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_GetVolume">
+            <summary>
+            Retrieves the current master volume level.
+            </summary>
+            <returns>If successful, the volume level is returned, else -1 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>The volume level... 0 (min) - 100 (max) will be returned.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoadUnicode(System.Boolean,System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Only used internally! See the file overload of <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoad(System.IntPtr,System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)"/> for details!
+            </summary>
+            <param name="mem">Needs to be set to FALSE</param>
+            <param name="file">The filename to load.</param>
+            <param name="offset">File offset to load the MOD music from.</param>
+            <param name="length">Data length... 0 = use all data up to the end of file.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>).</param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASS_MusicLoad(System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Loads a MOD music file - MO3 / IT / XM / S3M / MTM / MOD / UMX formats.
+            <para>This overload implements Unicode filenames. The BASS_UNICODE flag will be added automatically.</para>
+            </summary>
+            <param name="file">The file name from where to load the music.</param>
+            <param name="offset">File offset to load the MOD music from.</param>
+            <param name="length">Data length... 0 = use all data up to the end of file. If length over-runs the end of the file, it'll automatically be lowered to the end of the file.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>):
+            <list type="table">
+            <item><term>BASS_MUSIC_LOOP</term><description>Loop the music.</description></item>
+            <item><term>BASS_MUSIC_RAMP</term><description>Use "normal" ramping (as used in FastTracker 2).</description></item>
+            <item><term>BASS_MUSIC_RAMPS</term><description>Use "sensitive" ramping".</description></item>
+            <item><term>BASS_MUSIC_NONINTER</term><description>Use non-interpolated mixing. This generally reduces the sound quality, but can be good for chip-tunes.</description></item>
+            <item><term>BASS_MUSIC_FT2MOD</term><description>Play .MOD file as FastTracker 2 would.</description></item>
+            <item><term>BASS_MUSIC_PT1MOD</term><description>Play .MOD file as ProTracker 1 would.</description></item>
+            <item><term>BASS_MUSIC_POSRESET</term><description>Stop all notes when seeking (using <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>).</description></item>
+            <item><term>BASS_MUSIC_SURROUND</term><description>Apply XMPlay's surround sound to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_SURROUND2</term><description>Apply XMPlay's surround sound mode 2 to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_STOPBACK</term><description>Stop the music when a backward jump effect is played. This stops musics that never reach the end from going into endless loops. Some MOD musics are designed to jump all over the place, so this flag would cause those to be stopped prematurely. If this flag is used together with the BASS_SAMPLE_LOOP flag, then the music would not be stopped but any BASS_SYNC_END sync would be triggered.</description></item>
+            <item><term>BASS_MUSIC_CALCLEN</term><description>Calculate the playback length of the music, and enable seeking in bytes. This slightly increases the time taken to load the music, depending on how long it is. In the case of musics that loop, the length until the loop occurs is calculated. Use BASS_ChannelGetLength to retrieve the length.</description></item>
+            <item><term>BASS_MUSIC_NOSAMPLE</term><description>Don't load the samples. This reduces the time taken to load the music, notably with MO3 files, which is useful if you just want to get the name and length of the music without playing it.</description></item>
+            <item><term>BASS_UNICODE</term><description>file is a Unicode (16-bit characters) filename (not needed with this overload).</description></item>
+            </list>
+            </param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>BASSMOD uses the same code as XMPlay for it's MOD music support, giving the most accurate reproduction of MO3 / IT / XM / S3M / MTM / MOD / UMX files available from any sound system.</para>
+            <para>MO3s are treated and used in exactly the same way as normal MOD musics. The advantage of MO3s is that they can be a lot smaller with virtually identical quality. Playing a MO3 does not use any more CPU power than playing the original MOD version does. The only difference is a slightly longer load time as the samples are being decoded. MO3 files are created using the MO3 encoder available at the BASS website.</para>
+            <para>Ramping doesn't take a lot of extra processing and improves the sound quality by removing "clicks". Sensitive ramping leaves sharp attacked samples, while normal ramping can cause them to lose a-bit of their impact. Generally, normal ramping is recommended for XMs, and sensitive ramping for the other formats. But, some XMs may also sound better using sensitive ramping.</para>
+            <para>When loading a MOD music from memory, BASSMOD does not use the memory after it's loaded the MOD music. So you can do whatever you want with the memory after calling this function.</para>
+            </remarks>
+            <example>
+            <code>
+            int musicHandle = BassMOD.BASSMOD_MusicLoad("test.mod", 0, 0, (int)BASSMusic.BASS_DEFAULT);
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASS_MusicLoad(System.String,System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)">
+            <summary>
+            Loads a MOD music file - MO3 / IT / XM / S3M / MTM / MOD / UMX formats.
+            <para>This overload implements Unicode filenames. The BASS_UNICODE flag will be added automatically.</para>
+            </summary>
+            <param name="file">The file name from where to load the music.</param>
+            <param name="offset">File offset to load the MOD music from.</param>
+            <param name="length">Data length... 0 = use all data up to the end of file. If length over-runs the end of the file, it'll automatically be lowered to the end of the file.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>):
+            <list type="table">
+            <item><term>BASS_MUSIC_LOOP</term><description>Loop the music.</description></item>
+            <item><term>BASS_MUSIC_RAMP</term><description>Use "normal" ramping (as used in FastTracker 2).</description></item>
+            <item><term>BASS_MUSIC_RAMPS</term><description>Use "sensitive" ramping".</description></item>
+            <item><term>BASS_MUSIC_NONINTER</term><description>Use non-interpolated mixing. This generally reduces the sound quality, but can be good for chip-tunes.</description></item>
+            <item><term>BASS_MUSIC_FT2MOD</term><description>Play .MOD file as FastTracker 2 would.</description></item>
+            <item><term>BASS_MUSIC_PT1MOD</term><description>Play .MOD file as ProTracker 1 would.</description></item>
+            <item><term>BASS_MUSIC_POSRESET</term><description>Stop all notes when seeking (using <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>).</description></item>
+            <item><term>BASS_MUSIC_SURROUND</term><description>Apply XMPlay's surround sound to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_SURROUND2</term><description>Apply XMPlay's surround sound mode 2 to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_STOPBACK</term><description>Stop the music when a backward jump effect is played. This stops musics that never reach the end from going into endless loops. Some MOD musics are designed to jump all over the place, so this flag would cause those to be stopped prematurely. If this flag is used together with the BASS_SAMPLE_LOOP flag, then the music would not be stopped but any BASS_SYNC_END sync would be triggered.</description></item>
+            <item><term>BASS_MUSIC_CALCLEN</term><description>Calculate the playback length of the music, and enable seeking in bytes. This slightly increases the time taken to load the music, depending on how long it is. In the case of musics that loop, the length until the loop occurs is calculated. Use BASS_ChannelGetLength to retrieve the length.</description></item>
+            <item><term>BASS_MUSIC_NOSAMPLE</term><description>Don't load the samples. This reduces the time taken to load the music, notably with MO3 files, which is useful if you just want to get the name and length of the music without playing it.</description></item>
+            <item><term>BASS_UNICODE</term><description>file is a Unicode (16-bit characters) filename (not needed with this overload).</description></item>
+            </list>
+            </param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>BASSMOD uses the same code as XMPlay for it's MOD music support, giving the most accurate reproduction of MO3 / IT / XM / S3M / MTM / MOD / UMX files available from any sound system.</para>
+            <para>MO3s are treated and used in exactly the same way as normal MOD musics. The advantage of MO3s is that they can be a lot smaller with virtually identical quality. Playing a MO3 does not use any more CPU power than playing the original MOD version does. The only difference is a slightly longer load time as the samples are being decoded. MO3 files are created using the MO3 encoder available at the BASS website.</para>
+            <para>Ramping doesn't take a lot of extra processing and improves the sound quality by removing "clicks". Sensitive ramping leaves sharp attacked samples, while normal ramping can cause them to lose a-bit of their impact. Generally, normal ramping is recommended for XMs, and sensitive ramping for the other formats. But, some XMs may also sound better using sensitive ramping.</para>
+            <para>When loading a MOD music from memory, BASSMOD does not use the memory after it's loaded the MOD music. So you can do whatever you want with the memory after calling this function.</para>
+            </remarks>
+            <example>
+            <code>
+            int musicHandle = BassMOD.BASSMOD_MusicLoad("test.mod", 0, 0, (int)BASSMusic.BASS_DEFAULT);
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoadMemory(System.Boolean,System.IntPtr,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Only used internally! See the file overload of <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoad(System.IntPtr,System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)"/> for details!
+            </summary>
+            <param name="mem">Needs to be set to TRUE</param>
+            <param name="memory">An IntPtr to the memory block.</param>
+            <param name="offset">File offset to load the MOD music from.</param>
+            <param name="length">Needs to be set to the length of the buffer data which should be played.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>).</param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoad(System.IntPtr,System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)">
+            <summary>
+            Loads a MOD music file - MO3 / IT / XM / S3M / MTM / MOD / UMX formats.
+            <para>This overload implements loading from memory.</para>
+            </summary>
+            <param name="memory">An unmanaged pointer to the memory location as an IntPtr.</param>
+            <param name="offset">File offset to load the MOD music from.</param>
+            <param name="length">Data length... 0 = use all data up to the end of file. If length over-runs the end of the file, it'll automatically be lowered to the end of the file.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>):
+            <list type="table">
+            <item><term>BASS_MUSIC_LOOP</term><description>Loop the music.</description></item>
+            <item><term>BASS_MUSIC_RAMP</term><description>Use "normal" ramping (as used in FastTracker 2).</description></item>
+            <item><term>BASS_MUSIC_RAMPS</term><description>Use "sensitive" ramping".</description></item>
+            <item><term>BASS_MUSIC_NONINTER</term><description>Use non-interpolated mixing. This generally reduces the sound quality, but can be good for chip-tunes.</description></item>
+            <item><term>BASS_MUSIC_FT2MOD</term><description>Play .MOD file as FastTracker 2 would.</description></item>
+            <item><term>BASS_MUSIC_PT1MOD</term><description>Play .MOD file as ProTracker 1 would.</description></item>
+            <item><term>BASS_MUSIC_POSRESET</term><description>Stop all notes when seeking (using <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>).</description></item>
+            <item><term>BASS_MUSIC_SURROUND</term><description>Apply XMPlay's surround sound to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_SURROUND2</term><description>Apply XMPlay's surround sound mode 2 to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_STOPBACK</term><description>Stop the music when a backward jump effect is played. This stops musics that never reach the end from going into endless loops. Some MOD musics are designed to jump all over the place, so this flag would cause those to be stopped prematurely. If this flag is used together with the BASS_SAMPLE_LOOP flag, then the music would not be stopped but any BASS_SYNC_END sync would be triggered.</description></item>
+            <item><term>BASS_MUSIC_CALCLEN</term><description>Calculate the playback length of the music, and enable seeking in bytes. This slightly increases the time taken to load the music, depending on how long it is. In the case of musics that loop, the length until the loop occurs is calculated. Use BASS_ChannelGetLength to retrieve the length.</description></item>
+            <item><term>BASS_MUSIC_NOSAMPLE</term><description>Don't load the samples. This reduces the time taken to load the music, notably with MO3 files, which is useful if you just want to get the name and length of the music without playing it.</description></item>
+            <item><term>BASS_UNICODE</term><description>file is a Unicode (16-bit characters) filename (not needed with this overload).</description></item>
+            </list>
+            </param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>BASSMOD uses the same code as XMPlay for it's MOD music support, giving the most accurate reproduction of MO3 / IT / XM / S3M / MTM / MOD / UMX files available from any sound system.</para>
+            <para>MO3s are treated and used in exactly the same way as normal MOD musics. The advantage of MO3s is that they can be a lot smaller with virtually identical quality. Playing a MO3 does not use any more CPU power than playing the original MOD version does. The only difference is a slightly longer load time as the samples are being decoded. MO3 files are created using the MO3 encoder available at the BASS website.</para>
+            <para>Ramping doesn't take a lot of extra processing and improves the sound quality by removing "clicks". Sensitive ramping leaves sharp attacked samples, while normal ramping can cause them to lose a-bit of their impact. Generally, normal ramping is recommended for XMs, and sensitive ramping for the other formats. But, some XMs may also sound better using sensitive ramping.</para>
+            <para>When loading a MOD music from memory, BASSMOD does not use the memory after it's loaded the MOD music. So you can do whatever you want with the memory after calling this function.</para>
+            </remarks>
+            <example>
+            The following example demontrates how to load music from memory:
+            <code>
+            // Init Bass
+            BassMOD.BASSMOD_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT);
+            // open file
+            FileStream fs = File.OpenRead( "test.mod" );
+            // get the legth of the file
+            int length = (int)fs.Length;
+            // alloc memory for unmanaged code as an IntPtr
+            IntPtr buffer = Marshal.AllocCoTaskMem( length );
+            // read the file til EoF
+            int offset = 0;
+            while (true)
+            {
+            	int b = fs.ReadByte();
+            	if (b == -1)
+            		break; // EoF
+            	// write the byte to the buffer
+            	Marshal.WriteByte(buffer, offset, (byte)b);
+            	offset++;
+            }
+            // now the file is in memory, we can close our file stream
+            fs.Close();
+            // load the music
+            int music = BassMOD.BASSMOD_MusicLoad(buffer, 0, length, BASSMusic.BASS_MUSIC_LOOP);
+            if (music != 0 &amp;&amp; BassMOD.BASSMOD_MusicPlay() )
+            {
+            	// ...playing...
+            }
+            else
+            {
+            	int error = BassMOD.BASSMOD_ErrorGetCode();
+            	Console.WriteLine( Enum.GetName(typeof(BASSErrorCode), error) );
+            }
+            // free the unmanaged memory once the music has been loaded
+            Marshal.FreeCoTaskMem( buffer );
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoadMemory(System.Boolean,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Only used internally! See the file overload of <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoad(System.IntPtr,System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)"/> for details!
+            </summary>
+            <param name="mem">Needs to be set to TRUE</param>
+            <param name="memory">An IntPtr to the memory block.</param>
+            <param name="offset">File offset to load the MOD music from.</param>
+            <param name="length">Needs to be set to the length of the buffer data which should be played.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>).</param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoad(System.Byte[],System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)">
+            <summary>
+            Loads a MOD music file - MO3 / IT / XM / S3M / MTM / MOD / UMX formats.
+            <para>This overload implements loading from memory.</para>
+            </summary>
+            <param name="memory">A managed memory location as a byte[].</param>
+            <param name="offset">File offset to load the MOD music from.</param>
+            <param name="length">Data length... 0 = use all data up to the end of file. If length over-runs the end of the file, it'll automatically be lowered to the end of the file.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>):
+            <list type="table">
+            <item><term>BASS_MUSIC_LOOP</term><description>Loop the music.</description></item>
+            <item><term>BASS_MUSIC_RAMP</term><description>Use "normal" ramping (as used in FastTracker 2).</description></item>
+            <item><term>BASS_MUSIC_RAMPS</term><description>Use "sensitive" ramping".</description></item>
+            <item><term>BASS_MUSIC_NONINTER</term><description>Use non-interpolated mixing. This generally reduces the sound quality, but can be good for chip-tunes.</description></item>
+            <item><term>BASS_MUSIC_FT2MOD</term><description>Play .MOD file as FastTracker 2 would.</description></item>
+            <item><term>BASS_MUSIC_PT1MOD</term><description>Play .MOD file as ProTracker 1 would.</description></item>
+            <item><term>BASS_MUSIC_POSRESET</term><description>Stop all notes when seeking (using <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>).</description></item>
+            <item><term>BASS_MUSIC_SURROUND</term><description>Apply XMPlay's surround sound to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_SURROUND2</term><description>Apply XMPlay's surround sound mode 2 to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_STOPBACK</term><description>Stop the music when a backward jump effect is played. This stops musics that never reach the end from going into endless loops. Some MOD musics are designed to jump all over the place, so this flag would cause those to be stopped prematurely. If this flag is used together with the BASS_SAMPLE_LOOP flag, then the music would not be stopped but any BASS_SYNC_END sync would be triggered.</description></item>
+            <item><term>BASS_MUSIC_CALCLEN</term><description>Calculate the playback length of the music, and enable seeking in bytes. This slightly increases the time taken to load the music, depending on how long it is. In the case of musics that loop, the length until the loop occurs is calculated. Use BASS_ChannelGetLength to retrieve the length.</description></item>
+            <item><term>BASS_MUSIC_NOSAMPLE</term><description>Don't load the samples. This reduces the time taken to load the music, notably with MO3 files, which is useful if you just want to get the name and length of the music without playing it.</description></item>
+            <item><term>BASS_UNICODE</term><description>file is a Unicode (16-bit characters) filename (not needed with this overload).</description></item>
+            </list>
+            </param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>BASSMOD uses the same code as XMPlay for it's MOD music support, giving the most accurate reproduction of MO3 / IT / XM / S3M / MTM / MOD / UMX files available from any sound system.</para>
+            <para>MO3s are treated and used in exactly the same way as normal MOD musics. The advantage of MO3s is that they can be a lot smaller with virtually identical quality. Playing a MO3 does not use any more CPU power than playing the original MOD version does. The only difference is a slightly longer load time as the samples are being decoded. MO3 files are created using the MO3 encoder available at the BASS website.</para>
+            <para>Ramping doesn't take a lot of extra processing and improves the sound quality by removing "clicks". Sensitive ramping leaves sharp attacked samples, while normal ramping can cause them to lose a-bit of their impact. Generally, normal ramping is recommended for XMs, and sensitive ramping for the other formats. But, some XMs may also sound better using sensitive ramping.</para>
+            <para>When loading a MOD music from memory, BASSMOD does not use the memory after it's loaded the MOD music. So you can do whatever you want with the memory after calling this function.</para>
+            </remarks>
+            <example>
+            The following example demontrates how to load music from memory:
+            <code>
+            // Init Bass
+            BassMOD.BASSMOD_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT);
+            // open file
+            FileStream fs = File.OpenRead( "test.mod" );
+            // get the length of the file
+            int length = (int)fs.Length;
+            // create the buffer which will keep the file in memory
+            byte[] buffer = new byte[length];
+            // read the file into the buffer
+            fs.Read(buffer, 0, length);
+            // buffer is filled, file can be closed
+            fs.Close();
+            // load music from memory buffer
+            int music = BassMOD.BASSMOD_MusicLoad(buffer, 0, length, BASSMusic.BASS_DEFAULT);
+            if (music != 0 &amp;&amp; BassMOD.BASSMOD_MusicPlay() )
+            {
+            	// ...playing...
+            }
+            else
+            {
+            	int error = BassMOD.BASSMOD_ErrorGetCode();
+            	Console.WriteLine( Enum.GetName(typeof(BASSErrorCode), error) );
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicFree(System.Int32)">
+            <summary>
+            Frees a MOD music's resources, including any sync it has.
+            </summary>
+            <param name="handle">The MOD music handle (which has been created with <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoad(System.IntPtr,System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)"/>).</param>
+            <returns>If successful, TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicPlay">
+            <summary>
+            Starts (or resumes) playback of MOD music.
+            </summary>
+            <returns>If successful, TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            Playback continues from where it was last stopped or paused. If the MOD music has just been loaded, then playback starts from the beginning.
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicPlayEx(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Plays the MOD music, using the specified start position and flags.
+            </summary>
+            <param name="pos">Position to start playback from... LOWORD = order, HIWORD = row. If HIWORD = 0xFFFF, then LOWORD = position in seconds. If LOWORD and HIWORD are both 0xFFFF, then the position is left unchanged. Setting the position in seconds requires that the BASS_MUSIC_CALCLEN flag was used when the MOD music was loaded.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>):
+            <list type="table">
+            <item><term>BASS_MUSIC_LOOP</term><description>Loop the music.</description></item>
+            <item><term>BASS_MUSIC_RAMP</term><description>Use "normal" ramping (as used in FastTracker 2).</description></item>
+            <item><term>BASS_MUSIC_RAMPS</term><description>Use "sensitive" ramping".</description></item>
+            <item><term>BASS_MUSIC_NONINTER</term><description>Use non-interpolated mixing. This generally reduces the sound quality, but can be good for chip-tunes.</description></item>
+            <item><term>BASS_MUSIC_FT2MOD</term><description>Play .MOD file as FastTracker 2 would.</description></item>
+            <item><term>BASS_MUSIC_PT1MOD</term><description>Play .MOD file as ProTracker 1 would.</description></item>
+            <item><term>BASS_MUSIC_POSRESET</term><description>Stop all notes when seeking (using <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>).</description></item>
+            <item><term>BASS_MUSIC_SURROUND</term><description>Apply XMPlay's surround sound to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_SURROUND2</term><description>Apply XMPlay's surround sound mode 2 to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_STOPBACK</term><description>Stop the music when a backward jump effect is played. This stops musics that never reach the end from going into endless loops. Some MOD musics are designed to jump all over the place, so this flag would cause those to be stopped prematurely. If this flag is used together with the BASS_SAMPLE_LOOP flag, then the music would not be stopped but any BASS_SYNC_END sync would be triggered.</description></item>
+            <item><term>BASS_UNICODE</term><description>file is a Unicode (16-bit characters) filename (not needed with this overload).</description></item>
+            </list>
+            </param>
+            <param name="reset">TRUE = Stop all playing notes and reset BPM, etc... This is ignored if not also setting the position.</param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>When the position is left unchanged (pos = -1), this function does not start the music playing, but it will continue playing if it is already. This allows a music's flags (ramping, etc...) to be changed at any time.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicPlayEx(System.Int32,Un4seen.BassMOD.BASSMusic,System.Boolean)">
+            <summary>
+            Plays the MOD music, using the specified start position and flags.
+            </summary>
+            <param name="pos">Position to start playback from... LOWORD = order, HIWORD = row. If HIWORD = 0xFFFF, then LOWORD = position in seconds. If LOWORD and HIWORD are both 0xFFFF, then the position is left unchanged. Setting the position in seconds requires that the BASS_MUSIC_CALCLEN flag was used when the MOD music was loaded.</param>
+            <param name="flags">A combination of these flags (see <see cref="T:Un4seen.BassMOD.BASSMusic"/>):
+            <list type="table">
+            <item><term>BASS_MUSIC_LOOP</term><description>Loop the music.</description></item>
+            <item><term>BASS_MUSIC_RAMP</term><description>Use "normal" ramping (as used in FastTracker 2).</description></item>
+            <item><term>BASS_MUSIC_RAMPS</term><description>Use "sensitive" ramping".</description></item>
+            <item><term>BASS_MUSIC_NONINTER</term><description>Use non-interpolated mixing. This generally reduces the sound quality, but can be good for chip-tunes.</description></item>
+            <item><term>BASS_MUSIC_FT2MOD</term><description>Play .MOD file as FastTracker 2 would.</description></item>
+            <item><term>BASS_MUSIC_PT1MOD</term><description>Play .MOD file as ProTracker 1 would.</description></item>
+            <item><term>BASS_MUSIC_POSRESET</term><description>Stop all notes when seeking (using <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>).</description></item>
+            <item><term>BASS_MUSIC_SURROUND</term><description>Apply XMPlay's surround sound to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_SURROUND2</term><description>Apply XMPlay's surround sound mode 2 to the music (ignored in mono).</description></item>
+            <item><term>BASS_MUSIC_STOPBACK</term><description>Stop the music when a backward jump effect is played. This stops musics that never reach the end from going into endless loops. Some MOD musics are designed to jump all over the place, so this flag would cause those to be stopped prematurely. If this flag is used together with the BASS_SAMPLE_LOOP flag, then the music would not be stopped but any BASS_SYNC_END sync would be triggered.</description></item>
+            <item><term>BASS_UNICODE</term><description>file is a Unicode (16-bit characters) filename (not needed with this overload).</description></item>
+            </list>
+            </param>
+            <param name="reset">TRUE = Stop all playing notes and reset BPM, etc... This is ignored if not also setting the position.</param>
+            <returns>If successful, the loaded music's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>When the position is left unchanged (pos = -1), this function does not start the music playing, but it will continue playing if it is already. This allows a music's flags (ramping, etc...) to be changed at any time.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicDecode(System.IntPtr,System.Int32)">
+            <summary>
+            Gets decoded sample data from the MOD music.
+            </summary>
+            <param name="buffer">Location to write the decoded data.</param>
+            <param name="length">Number of bytes wanted.</param>
+            <returns>If an error occurs, -1 is returned, use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code. If successful, the number of bytes actually decoded will be returned.</returns>
+            <remarks>The returned sample data is in the standard Windows PCM format: 8-bit samples are unsigned, 16-bit samples are signed. There are no intermediate buffers involved, so as much data as is available can be decoded in one go.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicDecode(System.Int16@,System.Int32)">
+            <summary>
+            Gets decoded sample data from the MOD music.
+            </summary>
+            <param name="buffer">Location to write the decoded data.</param>
+            <param name="length">Number of bytes wanted.</param>
+            <returns>If an error occurs, -1 is returned, use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code. If successful, the number of bytes actually decoded will be returned.</returns>
+            <remarks>The returned sample data is in the standard Windows PCM format: 8-bit samples are unsigned, 16-bit samples are signed. There are no intermediate buffers involved, so as much data as is available can be decoded in one go.
+            <para>Note: In this example you pass a reference to the first element of the array. This will marshal the variable length C-type array automatically.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicDecode(System.Byte@,System.Int32)">
+            <summary>
+            Gets decoded sample data from the MOD music.
+            </summary>
+            <param name="buffer">Location to write the decoded data.</param>
+            <param name="length">Number of bytes wanted.</param>
+            <returns>If an error occurs, -1 is returned, use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code. If successful, the number of bytes actually decoded will be returned.</returns>
+            <remarks>The returned sample data is in the standard Windows PCM format: 8-bit samples are unsigned, 16-bit samples are signed. There are no intermediate buffers involved, so as much data as is available can be decoded in one go.
+            <para>Note: In this example you pass a reference to the first element of the array. This will marshal the variable length C-type array automatically.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicDecode(System.Byte[],System.Int32)">
+            <summary>
+            Gets decoded sample data from the MOD music.
+            </summary>
+            <param name="buffer">Location to write the decoded data.</param>
+            <param name="length">Number of bytes wanted.</param>
+            <returns>If an error occurs, -1 is returned, use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code. If successful, the number of bytes actually decoded will be returned.</returns>
+            <remarks>The returned sample data is in the standard Windows PCM format: 8-bit samples are unsigned, 16-bit samples are signed. There are no intermediate buffers involved, so as much data as is available can be decoded in one go.
+            <para>Note: In this example you pass a reference to the first element of the array. This will marshal the variable length C-type array automatically.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicIsActive">
+            <summary>
+            Checks if a MOD music is active (playing).
+            </summary>
+            <returns>The return value is one of the folowing (see <see cref="T:Un4seen.BassMOD.BASSActive"/>):
+            <list type="table">
+            <item><term>BASS_ACTIVE_STOPPED</term><description>The music is not active.</description></item>
+            <item><term>BASS_ACTIVE_PLAYING</term><description>The music is playing.</description></item>
+            <item><term>BASS_ACTIVE_PAUSED</term><description>The music is paused.</description></item>
+            </list>
+            </returns>
+            <remarks>
+            <para>When using the "decode only" device, BASS_ACTIVE_PLAYING will be returned until the end of the MOD music is reached, when BASS_ACTIVE_STOPPED will be returned.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetLength(System.Boolean)">
+            <summary>
+            Retrieves the length of the MOD music.
+            </summary>
+            <param name="playlen">The length to retrieve... TRUE = the playback length (in bytes), FALSE = the order length</param>
+            <returns>If succesful, then the music's length is returned, else -1 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetSync(System.Int32,System.Int32,Un4seen.BassMOD.SYNCPROC,System.Int32)">
+            <summary>
+            Sets up a synchronizer on a MOD music.
+            </summary>
+            <param name="type">The type of sync (see the table below or <see cref="T:Un4seen.BassMOD.BASSSync"/>), you may also use these flags:
+            <list type="table">
+            <item><term>BASS_SYNC_ONETIME</term><description>Call the sync only once.</description></item>
+            </list>
+            </param>
+            <param name="param">The sync parameters, depends on the sync type... see the table below.</param>
+            <param name="proc">The callback function which should be invoked with the sync.</param>
+            <param name="user">User instance data to pass to the callback function.</param>
+            <returns>If succesful, then the new synchronizer's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            Sync types, with param and <see cref="T:Un4seen.BassMOD.SYNCPROC"/> data definitions:
+            <list type="table">
+            <item><term>BASS_SYNC_POS</term><description>Sync when a channel reaches a position.
+            <para>param : position in bytes (automatically rounded down to nearest sample).</para>
+            <para>data : not used.</para>
+            </description></item>
+            <item><term>BASS_SYNC_END</term><description>Sync when a channel reaches the end. Note that some MOD musics never reach the end, they may jump to another position first. If the BASS_MUSIC_STOPBACK flag is used with a MOD music (through BASS_MusicLoad or BASS_ChannelSetFlags), then this sync will also be called when a backward jump effect is played.
+            <para>param : not used.</para>
+            <para>data : 1 = the sync is triggered by a backward jump in a MOD music, otherwise not used</para>
+            </description></item>
+            <item><term>BASS_SYNC_MUSICINST</term><description>Sync when an instrument (sample for the MOD/S3M/MTM formats) is played in a MOD music (not including retrigs).
+            <para>param : LOWORD = instrument (1=first), HIWORD = note (0=c0...119=b9, -1=all).</para>
+            <para>data : LOWORD = note, HIWORD = volume (0-64).</para>
+            </description></item>
+            <item><term>BASS_SYNC_MUSICFX</term><description>Sync when the sync effect is used in a MOD music. The sync effect is E8x or Wxx for the XM/MTM/MOD formats, and S2x for the IT/S3M formats (where x = any value).
+            <para>param : 0 = the position is passed to the callback (data : LOWORD = order, HIWORD = row),</para>
+            <para>param : 1 = the value of x is passed to the callback (data : x value).</para>
+            </description></item>
+            </list>
+            <para>Multiple synchronizers may be used. The MOD music does not have to be playing to set a synchronizer, they can be set before and while playing. Equally, synchronizers can be removed at any time too. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicRemoveSync(System.Int32)"/> to remove a sync. 
+            If the BASS_SYNC_ONETIME flag is used, then the sync is automatically removed after it's occured (ie. there's no need to remove it manually).</para>
+            </remarks>
+            <example>
+            <code>
+            private SYNCPROC mySync;
+            ...
+            mySync = new SYNCPROC(MySync);
+            BassMOD.BASSMOD_MusicSetSync((int)BASSSync.BASS_SYNC_END, 0, mySync, 0);
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetSync(Un4seen.BassMOD.BASSSync,System.Int32,Un4seen.BassMOD.SYNCPROC,System.Int32)">
+            <summary>
+            Sets up a synchronizer on a MOD music.
+            </summary>
+            <param name="type">The type of sync (see the table below or <see cref="T:Un4seen.BassMOD.BASSSync"/>), you may also use these flags:
+            <list type="table">
+            <item><term>BASS_SYNC_ONETIME</term><description>Call the sync only once.</description></item>
+            </list>
+            </param>
+            <param name="param">The sync parameters, depends on the sync type... see the table below.</param>
+            <param name="proc">The callback function which should be invoked with the sync.</param>
+            <param name="user">User instance data to pass to the callback function.</param>
+            <returns>If succesful, then the new synchronizer's handle is returned, else 0 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            Sync types, with param and <see cref="T:Un4seen.BassMOD.SYNCPROC"/> data definitions:
+            <list type="table">
+            <item><term>BASS_SYNC_POS</term><description>Sync when a channel reaches a position.
+            <para>param : position in bytes (automatically rounded down to nearest sample).</para>
+            <para>data : not used.</para>
+            </description></item>
+            <item><term>BASS_SYNC_END</term><description>Sync when a channel reaches the end. Note that some MOD musics never reach the end, they may jump to another position first. If the BASS_MUSIC_STOPBACK flag is used with a MOD music (through BASS_MusicLoad or BASS_ChannelSetFlags), then this sync will also be called when a backward jump effect is played.
+            <para>param : not used.</para>
+            <para>data : 1 = the sync is triggered by a backward jump in a MOD music, otherwise not used</para>
+            </description></item>
+            <item><term>BASS_SYNC_MUSICINST</term><description>Sync when an instrument (sample for the MOD/S3M/MTM formats) is played in a MOD music (not including retrigs).
+            <para>param : LOWORD = instrument (1=first), HIWORD = note (0=c0...119=b9, -1=all).</para>
+            <para>data : LOWORD = note, HIWORD = volume (0-64).</para>
+            </description></item>
+            <item><term>BASS_SYNC_MUSICFX</term><description>Sync when the sync effect is used in a MOD music. The sync effect is E8x or Wxx for the XM/MTM/MOD formats, and S2x for the IT/S3M formats (where x = any value).
+            <para>param : 0 = the position is passed to the callback (data : LOWORD = order, HIWORD = row),</para>
+            <para>param : 1 = the value of x is passed to the callback (data : x value).</para>
+            </description></item>
+            </list>
+            <para>Multiple synchronizers may be used. The MOD music does not have to be playing to set a synchronizer, they can be set before and while playing. Equally, synchronizers can be removed at any time too. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicRemoveSync(System.Int32)"/> to remove a sync. 
+            If the BASS_SYNC_ONETIME flag is used, then the sync is automatically removed after it's occured (ie. there's no need to remove it manually).</para>
+            </remarks>
+            <example>
+            <code>
+            private SYNCPROC mySync;
+            ...
+            mySync = new SYNCPROC(MySync);
+            BassMOD.BASSMOD_MusicSetSync(BASSSync.BASS_SYNC_END, 0, mySync, 0);
+            </code>
+            </example>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicRemoveSync(System.Int32)">
+            <summary>
+            Removes a synchronizer from a MOD music.
+            </summary>
+            <param name="sync">Handle of the synchronizer to remove (return value of a previous <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetSync(System.Int32,System.Int32,Un4seen.BassMOD.SYNCPROC,System.Int32)"/> call).</param>
+            <returns>If succesful, TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicStop">
+            <summary>
+            Stops the MOD music.
+            </summary>
+            <returns>If successful, TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicPause">
+            <summary>
+            Pauses the MOD music.
+            </summary>
+            <returns>If successful, TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicPlay"/> to resume a paused music. <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicStop"/> can be used to stop a paused music.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)">
+            <summary>
+            Sets the playback position of MOD music.
+            </summary>
+            <param name="pos">The position, in bytes. With MOD musics, the <see cref="M:Un4seen.BassMOD.Utils.MakeMusicPos(System.Int32,System.Int32)"/>(order,row) method can be used to set the position in orders and rows instead of bytes.
+            Setting the position in seconds requires that the BASS_MUSIC_CALCLEN flag was used when the MOD music was loaded.</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>
+            <para>When the BASS_MUSIC_POSRESET flag is active, all notes that were playing before the position changed will be stopped. Otherwise, the notes will continue playing until they are stopped in the MOD music. When setting the position in seconds, the BPM &amp; tempo are updated to what they would normally be at the new position. Otherwise they are left as they were prior to the postion change.</para>
+            </remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32,System.Int32)">
+            <summary>
+            Sets the playback position of a MOD music.
+            </summary>
+            <param name="order">The order position.</param>
+            <param name="row">The row position.</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>This is just an overload which uses <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/> and <see cref="M:Un4seen.BassMOD.Utils.MakeMusicPos(System.Int32,System.Int32)"/> internally.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetPosition">
+            <summary>
+            Retrieves the playback position (in bytes) of a sample, stream, or MOD music. Can also be used with a recording channel.
+            </summary>
+            <returns>If an error occurs, -1 is returned, use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code. If successful, the position is returned.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetNamePtr">
+            <summary>
+            Internally used.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetName">
+            <summary>
+            Retrieves the MOD music's name.
+            </summary>
+            <returns>If succesful, then the music's name is returned, else NULL is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetAmplify(System.Int32)">
+            <summary>
+            Sets the MOD music's amplification level.
+            </summary>
+            <param name="amp">Amplification level... 0 (min) - 100 (max)... the default when a MOD music is loaded is 50.</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPanSep(System.Int32)">
+            <summary>
+            Sets the MOD music's pan seperation level.
+            </summary>
+            <param name="pan">Pan seperation... 0 (min) - 100 (max), 50 = linear (which is the default when a MOD music is loaded).</param>
+            <returns> succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPositionScaler(System.Int32)">
+            <summary>
+            Sets the MOD music's <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetPosition"/> scaler.
+            </summary>
+            <param name="scale">The scaler... 1 (min) - 256 (max)... the default when a MOD music is loaded is 1.</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>When you call <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetPosition"/>, the row (HIWORD) will be scaled by this value. By using a higher scaler, you can get a more precise position indication.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetVolume(System.Int32,System.Int32)">
+            <summary>
+            Sets the volume level of a channel or instrument in a MOD music.
+            </summary>
+            <param name="chanins">The channel or instrument to set the volume of... if the HIWORD is 0, then the LOWORD is a channel number (0 = 1st channel), else the LOWORD is an instrument number (0 = 1st instument).</param>
+            <param name="volume">The volume level... 0 (min) - 100 (max).</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>The effect of changes made with this function are not heard instantaneously, due to buffering. The volume level of all channels and instruments is initially 100. For MOD formats that do not use instruments, read "sample" for "instrument".</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetChannelVolume(System.Int32,System.Int32)">
+            <summary>
+            Sets the volume level of a channel in a MOD music.
+            </summary>
+            <param name="channel">The channel number (0 = 1st channel).</param>
+            <param name="volume">The volume level... 0 (min) - 100 (max).</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>Sets the HIWORD to 0 and uses the channel for the LOWORD.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetInstrumentVolume(System.Int32,System.Int32)">
+            <summary>
+            Sets the volume level of an instrument in a MOD music.
+            </summary>
+            <param name="instrument">The instrument number (0 = 1st instrument).</param>
+            <param name="volume">The volume level... 0 (min) - 100 (max).</param>
+            <returns>If succesful, then TRUE is returned, else FALSE is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+            <remarks>Sets the HIWORD to 1 and uses the instrument for the LOWORD.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetVolume(System.Int32)">
+            <summary>
+            Retrieves the volume level of a channel or instrument in a MOD music.
+            </summary>
+            <param name="chanins">The channel or instrument to retrieve the volume of... if the HIWORD is 0, then the LOWORD is a channel number (0 = 1st channel), else the LOWORD is an instrument number (0 = 1st instument).</param>
+            <returns>If succesful, then the requested volume level is returned, else -1 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetChannelVolume(System.Int32)">
+            <summary>
+            Retrieves the volume level of a channel in a MOD music.
+            </summary>
+            <param name="channel">The channel to retrieve the volume of (0 = 1st channel).</param>
+            <returns>If succesful, then the requested volume level is returned, else -1 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicGetInstrumentVolume(System.Int32)">
+            <summary>
+            Retrieves the volume level of an instrument in a MOD music.
+            </summary>
+            <param name="instrument">The instrument to retrieve the volume of (0 = 1st instrument).</param>
+            <returns>If succesful, then the requested volume level is returned, else -1 is returned. Use <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> to get the error code.</returns>
+        </member>
+        <member name="F:Un4seen.BassMOD.BassMOD.SupportedMusicExtensions">
+            <summary>
+            Supported music file extensions of the bass.dll
+            </summary>
+        </member>
+        <member name="T:Un4seen.BassMOD.BASSErrorCode">
+            <summary>
+            BASS error codes as returned e.g. by <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_ErrorGetCode"/> (int)
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_OK">
+            <summary>
+            all is OK
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_MEM">
+            <summary>
+            memory error
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_FILEOPEN">
+            <summary>
+            can't open the file
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_DRIVER">
+            <summary>
+            can't find a free/valid driver
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_HANDLE">
+            <summary>
+            invalid handle
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_FORMAT">
+            <summary>
+            unsupported sample format
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_POSITION">
+            <summary>
+            invalid playback position
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_INIT">
+            <summary>
+            BASS_Init has not been successfully called
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_START">
+            <summary>
+            BASS_Start has not been successfully called
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_ALREADY">
+            <summary>
+            already initialized/paused/whatever
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_ILLTYPE">
+            <summary>
+            an illegal type was specified
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_ILLPARAM">
+            <summary>
+            an illegal parameter was specified
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_DEVICE">
+            <summary>
+            illegal device number
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_NOPLAY">
+            <summary>
+            not playing
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_NOMUSIC">
+            <summary>
+            the stream is not a file stream
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_NOSZNC">
+            <summary>
+            no hardware voices available
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_EMPTY">
+            <summary>
+            the MOD music has no sequence data
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_NOTAVAIL">
+            <summary>
+            requested data is not available
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_DECODE">
+            <summary>
+            the channel is a 'decoding channel'
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSErrorCode.BASS_ERROR_FILEFORM">
+            <summary>
+            unsupported file format
+            </summary>
+        </member>
+        <member name="T:Un4seen.BassMOD.BASSInit">
+            <summary>
+            Initialization flags to be used with <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_Init(System.Int32,System.Int32,System.Int32)"/>
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSInit.BASS_DEVICE_DEFAULT">
+            <summary>
+            0 = 16 bit, stereo, no 3D, no Latency calc, no Speaker Assignments
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSInit.BASS_DEVICE_8BITS">
+            <summary>
+            use 8 bit resolution, else 16 bit
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSInit.BASS_DEVICE_MONO">
+            <summary>
+            use mono, else stereo
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSInit.BASS_DEVICE_NOSYNC">
+            <summary>
+            disable synchronizers
+            </summary>
+        </member>
+        <member name="T:Un4seen.BassMOD.BASSMusic">
+            <summary>
+            Music create flags to be used with <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicLoad(System.IntPtr,System.Int32,System.Int32,Un4seen.BassMOD.BASSMusic)"/> etc.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_DEFAULT">
+            <summary>
+            0 = default create music: 16 Bit, stereo
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_RAMP">
+            <summary>
+            Use "normal" ramping (as used in FastTracker 2).
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_RAMPS">
+            <summary>
+            Use "sensitive" ramping.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_LOOP">
+            <summary>
+            Loop the music.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_FT2MOD">
+            <summary>
+            Play .MOD file as FastTracker 2 would.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_PT1MOD">
+            <summary>
+            Play .MOD file as ProTracker 1 would.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_POSRESET">
+            <summary>
+            Stop all notes when seeking (using <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>). 
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_SURROUND">
+            <summary>
+            Surround sound.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_SURROUND2">
+            <summary>
+            Surround sound (mode 2).
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_STOPBACK">
+            <summary>
+            Stop the music when a backward jump effect is played. This stops musics that never reach the end from going into endless loops. 
+            Some MOD musics are designed to jump all over the place, so this flag would cause those to be stopped prematurely. 
+            If this flag is used together with the BASS_MUSIC_LOOP flag, then the music would not be stopped but any BASS_SYNC_END sync would be triggered.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_CALCLE">
+            <summary>
+            Calculate playback length.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_NONINTER">
+            <summary>
+            Non-interpolated mixing.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_MUSIC_NOSAMPLE">
+            <summary>
+            Don't load the samples. This reduces the time taken to load the music, notably with MO3 files, which is useful if you just want to get the name and length of the music without playing it.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSMusic.BASS_UNICODE">
+            <summary>
+            file is a Unicode (16-bit characters) filename
+            </summary>
+        </member>
+        <member name="T:Un4seen.BassMOD.BASSSync">
+            <summary>
+            Sync types to be used with <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetSync(System.Int32,System.Int32,Un4seen.BassMOD.SYNCPROC,System.Int32)"/> (param flag) and <see cref="T:Un4seen.BassMOD.SYNCPROC"/> (data flag).
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSSync.BASS_SYNC_POS">
+            <summary>
+            Sync when a MOD music reaches an order:row position.
+            <para>param : LOWORD=order (0=first, -1=all) HIWORD=row (0=first, -1=all)</para>
+            <para>data : LOWORD=order HIWORD=row</para>
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSSync.BASS_SYNC_MUSICINST">
+            <summary>
+            Sync when an instrument (sample for the non-instrument based formats) is played in a MOD music (not including retrigs).
+            <para>param : LOWORD=instrument (1=first) HIWORD=note (0=c0...119=b9, -1=all)</para>
+            <para>data : LOWORD=note HIWORD=volume (0-64)</para>
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSSync.BASS_SYNC_END">
+            <summary>
+            Sync when a channel reaches the end.
+            <para>param : not used</para>
+            <para>data : 1 = the sync is triggered by a backward jump in a MOD music, otherwise not used</para>
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSSync.BASS_SYNC_MUSICFX">
+            <summary>
+            Sync when the "sync" effect (XM/MTM/MOD: E8x/Wxx, IT/S3M: S2x) is used.
+            <para>param : 0:data=pos, 1:data="x" value</para>
+            <para>data : param=0: LOWORD=order HIWORD=row, param=1: "x" value</para>
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSSync.BASS_SYNC_ONETIME">
+            <summary>
+            FLAG: sync only once, else continuously
+            </summary>
+        </member>
+        <member name="T:Un4seen.BassMOD.BASSActive">
+            <summary>
+            <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicIsActive"/> return values.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSActive.BASS_ACTIVE_STOPPED">
+            <summary>
+            The music is not active, or handle is not valid music.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSActive.BASS_ACTIVE_PLAYING">
+            <summary>
+            The music is playing.
+            </summary>
+        </member>
+        <member name="F:Un4seen.BassMOD.BASSActive.BASS_ACTIVE_PAUSED">
+            <summary>
+            The music is paused.
+            </summary>
+        </member>
+        <member name="T:Un4seen.BassMOD.SYNCPROC">
+            <summary>
+            User defined synchronizer callback function (see <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetSync(System.Int32,System.Int32,Un4seen.BassMOD.SYNCPROC,System.Int32)"/> for details).
+            </summary>
+            <remarks>
+            <list type="table">
+            <listheader><term>Parameters:</term><description></description></listheader>
+            <item><term><paramref name="handle"/></term><description>The sync handle that has occured.</description></item>
+            <item><term><paramref name="channel"/></term><description>The channel that the sync occured on.</description></item>
+            <item><term><paramref name="data"/></term><description>Additional data associated with the sync's occurance.</description></item>
+            <item><term><paramref name="user"/></term><description>The user instance data given when <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetSync(System.Int32,System.Int32,Un4seen.BassMOD.SYNCPROC,System.Int32)"/> was called.</description></item>
+            </list>
+            <para> </para>
+            <para>A sync callback function should be very quick as other syncs can't be processed until it has finished.</para>
+            <para>NOTE: When you pass an instance of a callback delegate to one of the BASS functions, this delegate object will not be reference counted. 
+            This means .NET would not know, that it might still being used by BASSMOD. The Garbage Collector might (re)move the delegate instance, if the variable holding the delegate is not declared as global.
+            So make sure to always keep your delegate instance in a variable which lives as long as BASS needs it, e.g. use a global variable or member.</para>
+            </remarks>
+            <example>
+            Do some processing until a MOD music reaches the 10th order
+            <code>
+            bool order10 = false; // the order 10 flag
+            ...
+            // the sync callback
+            private SYNCPROC mySyncProc;
+            private void MySync(int syncHandle, int channel, int data, int user) 
+            {
+            	order10 = true; // set the order 10 flag
+            }
+            ...
+            // set the one-time order 10 sync
+            mySyncProc = new SYNCPROC(MySync);
+            Bass.BASS_ChannelSetSync(music, BASSSync.BASS_SYNC_MUSICPOS | BASSSync.BASS_SYNC_ONETIME, (long)Utils.MakeLong(10,0), mySyncProc, 0);
+            while (!order10) 
+            {
+            	// order 10 has not arrived, so do some processing
+            }
+            // order 10 has arrived!
+            ...
+            </code>
+            </example>
+        </member>
+        <member name="T:Un4seen.BassMOD.Utils">
+            <summary>
+            BassMOD.NET API helper and misc. class containing some general useful methods.
+            </summary>
+            <remarks>Contains basically some generic converter utilities.</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.#ctor">
+            <summary>
+            NOT used - all members are static!
+            </summary>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.MakeLong(System.Int16,System.Int16)">
+            <summary>
+            Returns an signed Int32 value which is composed out of a low and high value.
+            </summary>
+            <param name="lowWord">The significant part for the lower 16-bit.</param>
+            <param name="highWord">The significant part for the higher 16-bit.</param>
+            <returns>The combined signed Int32 value.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.MakeLong(System.Int32,System.Int32)">
+            <summary>
+            Returns an signed Int32 value which is composed out of a low and high value.
+            </summary>
+            <param name="lowWord">The significant part for the lower 16-bit.</param>
+            <param name="highWord">The significant part for the higher 16-bit.</param>
+            <returns>The combined signed Int32 value.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.MakeLong64(System.Int32,System.Int32)">
+            <summary>
+            Returns an signed Int64 value which is composed out of a low and high value.
+            </summary>
+            <param name="lowWord">The significant part for the lower 16-bit.</param>
+            <param name="highWord">The significant part for the higher 16-bit.</param>
+            <returns>The combined signed Int64 value.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.MakeLong64(System.Int64,System.Int64)">
+            <summary>
+            Returns an signed Int64 value which is composed out of a low and high value.
+            </summary>
+            <param name="lowWord">The significant part for the lower 16-bit.</param>
+            <param name="highWord">The significant part for the higher 16-bit.</param>
+            <returns>The combined signed Int64 value.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.HighWord(System.Int32)">
+            <summary>
+            Returns the higher 16-bit of an signed Int32 as a short value.
+            </summary>
+            <param name="dWord">The signed Int32 value from which to extract the higher significant 16-bit</param>
+            <returns>The higher 16-bit value as a short.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.HighWord32(System.Int32)">
+            <summary>
+            Returns the higher 16-bit of an signed Int32 as an integer value.
+            </summary>
+            <param name="dWord">The signed Int32 value from which to extract the higher significant 16-bit</param>
+            <returns>The higher 16-bit value as an integer.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.HighWord(System.Int64)">
+            <summary>
+            Returns the higher 32-bit of an signed Int64 as an integer value.
+            </summary>
+            <param name="qWord">The signed Int64 value from which to extract the higher significant 32-bit</param>
+            <returns>The higher 32-bit value as an integer</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.LowWord(System.Int32)">
+            <summary>
+            Returns the lower 16-bit of an signed Int32 as a short value.
+            </summary>
+            <param name="dWord">The signed Int32 value from which to extract the lower significant 16-bit</param>
+            <returns>The lower 16-bit value as a short.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.LowWord32(System.Int32)">
+            <summary>
+            Returns the lower 16-bit of an signed Int32 as an integer value.
+            </summary>
+            <param name="dWord">The signed Int32 value from which to extract the lower significant 16-bit</param>
+            <returns>The lower 16-bit value as an integer.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.LowWord(System.Int64)">
+            <summary>
+            Returns the lower 32-bit of an signed Int64 as an integer value
+            </summary>
+            <param name="qWord">The signed Int64 value from which to extract the lower significant 32-bit</param>
+            <returns>The lower 32-bit value as an integer</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.MakeMusicPos(System.Int32,System.Int32)">
+            <summary>
+            Can be used to set the position in orders and rows instead of bytes (to be used with <see cref="M:Un4seen.BassMOD.BassMOD.BASSMOD_MusicSetPosition(System.Int32)"/>).
+            </summary>
+            <param name="order">The order value</param>
+            <param name="row">The row value</param>
+            <returns>The position in bytes which relates to the order and row.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.IntAsStringAnsi(System.Int32)">
+            <summary>
+            Translates an int (DWORD) into a .NET managed string.
+            <para>Sometime BASSMOD returns a DWORD (int) which actually represents a pointer to a memory block containing a null-terminated Ansi *char (string, 8-bit).
+            This method does this translation for you and returns the actual string.</para>
+            </summary>
+            <param name="dWord">The Int32 value which represents the address of the first character of the unmanaged *char (string, 8-bit) - use on Win32 systems only.</param>
+            <returns>The translated unicode string.</returns>
+            <remarks>This method actually expands the original 8-bit chars to unicode 16-bit chars as required by .NET (since here each string a unicode ;-).</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.IntPtrAsStringAnsi(System.IntPtr)">
+            <summary>
+            Translates an IntPtr into a .NET managed string.
+            <para>Sometime BASSMOD returns an IntPtr which actually represents a pointer to a memory block containing a null-terminated Ansi *char (string, 8-bit).
+            This method does this translation for you and returns the actual string.</para>
+            </summary>
+            <param name="ansiPtr">The IntPtr which represents the address of the first character of the unmanaged *char (string, 8-bit).</param>
+            <returns>The translated unicode string.</returns>
+            <remarks>This method actually expands the original 8-bit chars to unicode 16-bit chars as required by .NET (since here each string a unicode ;-).</remarks>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.IntAsStringUnicode(System.Int32)">
+            <summary>
+            Translates an int (DWORD) into a .NET managed string.
+            <para>Sometime BASSMOD returns a DWORD (int) which actually represents a pointer to a memory block containing a null-terminated Unicode *char (string, 16-bit).
+            This method does this translation for you and returns the actual string.</para>
+            </summary>
+            <param name="dWord">The Int32 value which represents the address of the first character of the unmanaged *char (string, 16-bit) - use on Win32 systems only.</param>
+            <returns>The translated unicode string.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.IntPtrAsStringUnicode(System.IntPtr)">
+            <summary>
+            Translates an IntPtr into a .NET managed string.
+            <para>Sometime BASSMOD returns an IntPtr which actually represents a pointer to a memory block containing a null-terminated Unicode *char (string, 16-bit).
+            This method does this translation for you and returns the actual string.</para>
+            </summary>
+            <param name="unicodePtr">The IntPtr which represents the address of the first character of the unmanaged *char (string, 16-bit).</param>
+            <returns>The translated unicode string.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.GetVersion">
+            <summary>
+            Returns the version of the BASS.NET API (Bass.Net.dll)
+            </summary>
+            <returns>The version of the Bass.Net.dll</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.IntPtrToArrayNullTermAnsi(System.IntPtr)">
+            <summary>
+            Retrieves an array of strings from a given unmanaged memory location.
+            <para>NOTE: This method evaluates the pointer as 'a series/array of null-terminated Ansi strings.</para>
+            </summary>
+            <param name="pointer">The pointer to the unmanaged memory block.</param>
+            <returns>NULL or an array of strings. Each array element will represent one text as obtained from the IntPtr.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.IntPtrToArrayNullTermUtf8(System.IntPtr)">
+            <summary>
+            Retrieves an array of strings from a given unmanaged memory location.
+            <para>NOTE: This method evaluates the pointer as 'a series/array of null-terminated UTF-8 strings.</para>
+            </summary>
+            <param name="pointer">The pointer to the unmanaged memory block.</param>
+            <returns>NULL or an array of strings. Each array element will represent one text as obtained from the IntPtr.</returns>
+        </member>
+        <member name="M:Un4seen.BassMOD.Utils.IntPtrToArrayNullTermUnicode(System.IntPtr)">
+            <summary>
+            Retrieves an array of strings from a given unmanaged memory location.
+            <para>NOTE: This method evaluates the pointer as 'a series/array of null-terminated UNICODE strings.</para>
+            </summary>
+            <param name="pointer">The pointer to the unmanaged memory block.</param>
+            <returns>NULL or an array of strings. Each array element will represent one text as obtained from the IntPtr.</returns>
+        </member>
+    </members>
+</doc>
