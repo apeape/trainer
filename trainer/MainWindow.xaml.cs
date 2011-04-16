@@ -174,18 +174,27 @@ namespace trainer
             GameMemory.Write(GameBaseAddress + 0x628D0, ref NoFogOn);
         }
 
-        const double DefaultMovementAccel = 0.1000000014901161;
-        const double SpeedHackAccel = 0.9;
+        //const double DefaultMovementAccel = 0.1000000014901161;
+        //const double SpeedHackAccel = 0.9;
+        byte[] SpeedHackOn = new byte[] { 0xDC, 0x0D, 0x88, 0x84, 0x31, 0x01 };
+        byte[] SpeedHackOff = new byte[] { 0xDC, 0x0D, 0xF0, 0x82, 0x31, 0x01 };
         private void SpeedHack_HotkeyPressed()
         {
-            GameMemory.WriteF64(GameBaseAddress + 0x38448, SpeedHackAccel);
+            GameMemory.Write(GameBaseAddress + 0x23FB8, ref SpeedHackOn);
         }
 
-        const float DefaultJumpHeight = -0.32f;
-        const float MegaJumpHeight = -0.9f;
+        //const float DefaultJumpHeight = -0.32f;
+        //const float MegaJumpHeight = -0.9f;
+        // jump height patch
+        byte[] MegaJumpOn = new byte[] { 0xD9, 0x05, 0xF0, 0x83, 0x31, 0x01 };
+        byte[] MegaJumpOff = new byte[] { 0xD9, 0x05, 0x40, 0x85, 0x31, 0x01 };
+        // jump steering patch
+        byte[] MegaJumpSteeringOn = new byte[] { 0xDC, 0x0D, 0x20, 0x84, 0x31, 0x01 };
+        byte[] MegaJumpSteeringOff = new byte[] { 0xDC, 0x0D, 0x48, 0x84, 0x31, 0x01 };
         private void MegaJump_HotkeyPressed()
         {
-            GameMemory.WriteF32(GameBaseAddress + 0x38540, MegaJumpHeight);
+            GameMemory.Write(GameBaseAddress + 0x23F26, ref MegaJumpOn);
+            GameMemory.Write(GameBaseAddress + 0x23F90, ref MegaJumpSteeringOn);
         }
 
         byte[] MultiJumpOn = new byte[] { 0x90, 0x90 };
