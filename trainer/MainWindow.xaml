@@ -136,7 +136,7 @@
             </Image.LayoutTransform>
         </Image>
         <TextBlock HorizontalAlignment="Left" Name="OptionsText" VerticalAlignment="Top" 
-                   Width="325" Foreground="White" TextWrapping="Wrap"
+                   Width="355" Foreground="White" TextWrapping="Wrap"
                    UseLayoutRounding="True" FontSize="14" Padding="10">
             <TextBlock.Effect>
                 <DropShadowEffect
@@ -156,7 +156,8 @@
             f8  - mega jump<LineBreak/>
             f9  - multi jump<LineBreak/>
             f10 - super nade distance<LineBreak/>
-            f11 - enable all but super nade distance<LineBreak/>
+            f11 - enable all above except super nade distance<LineBreak/>
+            + key - mega destruction mode (client side)
         </TextBlock>
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Bottom" 
                    Foreground="White" TextWrapping="Wrap"
