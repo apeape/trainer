@@ -309,15 +309,52 @@ namespace trainer
             0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
             0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
         };
+        object MegaDestructionLock = new object();
+        bool MegaDestructionDone = false;
+        /// <summary>
+        /// this causes the client to crash when playing online pretty frequently,
+        /// maybe due to undeletable blocks being deleted from the huge areas being modified
+        /// </summary>
         private void MegaDestruction_HotkeyPressed()
         {
-            // this forces the block destruction to use the grenade style (big ass chunk)
-            GameMemory.Write(GameBaseAddress + 0x25FF3, ref ForceBlockDestructionSwitch);
+            lock (MegaDestructionLock)
+            {
+                if (!MegaDestructionDone)
+                {
+                    MegaDestructionDone = true;
+                    // this forces the block destruction to use the grenade style (big ass chunk)
+                    GameMemory.Write(GameBaseAddress + 0x25FF3, ref ForceBlockDestructionSwitch);
 
-            // adjust the dimensions of the chunk destroyed (default is 2x2x2)
-            GameMemory.WriteU8(GameBaseAddress + 0x199F3, 15);
-            GameMemory.WriteU8(GameBaseAddress + 0x19A1A, 15);
-            GameMemory.WriteU8(GameBaseAddress + 0x19A4A, 15);
+                    // adjust the dimensions of the chunk destroyed (default is 2x2x2)
+                    GameMemory.WriteU8(GameBaseAddress + 0x199F3, 15);
+                    GameMemory.WriteU8(GameBaseAddress + 0x19A1A, 15);
+                    GameMemory.WriteU8(GameBaseAddress + 0x19A4A, 15);
+
+                    Options["MegaDestruction"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+                }
+            }
+        }
+        object LongRangePickAxeLock = new object();
+        bool LongRangePickAxeDone = false;
+        private void LongRangePickAxe_HotkeyPressed()
+        {
+            lock (LongRangePickAxeLock)
+            {
+                if (!LongRangePickAxeDone)
+                {
+                    LongRangePickAxeDone = true;
+                    // set the range for pickaxe to 32000, -32000 (was 3, -3)
+                    uint PickRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x2486A);
+                    PickRangeUpperBoundPtr -= 0xCC;
+                    GameMemory.WriteU32(GameBaseAddress + 0x2486A, PickRangeUpperBoundPtr);
+
+                    uint PickRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24881);
+                    PickRangeLowerBoundPtr -= 0xD8;
+                    GameMemory.WriteU32(GameBaseAddress + 0x24881, PickRangeLowerBoundPtr);
+
+                    Options["LongRangePickAxe"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+                }
+            }
         }
 
 
@@ -342,6 +379,7 @@ namespace trainer
                 TrainerOption EnableAll = new TrainerOption(Keys.F11, EnableAll_HotkeyPressed, windowHandle);
 
                 TrainerOption MegaDestruction = new TrainerOption(Keys.Add, MegaDestruction_HotkeyPressed, windowHandle);
+                TrainerOption LongRangePickAxe = new TrainerOption(Keys.Subtract, LongRangePickAxe_HotkeyPressed, windowHandle);
 
                 TrainerOption NadeSpam = new TrainerOption(Keys.Z, NadeSpammer, windowHandle);
                 
@@ -359,6 +397,7 @@ namespace trainer
                 Options.Add("EnableAll", EnableAll);
                 Options.Add("NadeSpam", NadeSpam);
                 Options.Add("MegaDestruction", MegaDestruction);
+                Options.Add("LongRangePickAxe", LongRangePickAxe);
             });
         }
 

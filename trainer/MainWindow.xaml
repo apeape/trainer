@@ -1,7 +1,7 @@
 ﻿<Window x:Class="trainer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ace of spades 0.26 trainer" Height="314" Width="347"
+        Title="ace of spades 0.26 trainer" Height="340" Width="350"
         Loaded="Window_Loaded" Closing="Window_Closing"
         Icon="/trainer;component/Peggle.ico" ResizeMode="CanMinimize"
         xmlns:local="clr-namespace:trainer">
@@ -157,7 +157,8 @@
             f9  - multi jump<LineBreak/>
             f10 - super nade distance<LineBreak/>
             f11 - enable all above except super nade distance<LineBreak/>
-            + key - mega destruction mode (client side)
+            + key - mega destruction mode (client side)<LineBreak/>
+            - key - extend pickaxe range
         </TextBlock>
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Bottom" 
                    Foreground="White" TextWrapping="Wrap"
