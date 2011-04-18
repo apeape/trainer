@@ -135,14 +135,15 @@ namespace trainer
             GameMemory.Write(GameBaseAddress + 0x23DE5, ref GodModeOn);
         }
 
-        byte[] InfAmmoGunOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+        byte[] InfAmmoOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         byte[] InfAmmoGunOff = new byte[] { 0xFF, 0x0D, 0xA4, 0xBC, 0x50, 0x03 };
-        byte[] InfAmmoNadesOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         byte[] InfAmmoNadesOff = new byte[] { };
+        byte[] InfAmmoBlocksOff = new byte[] { };
         private void InfAmmo_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x2539D, ref InfAmmoGunOn);
-            GameMemory.Write(GameBaseAddress + 0x254C7, ref InfAmmoNadesOn);
+            GameMemory.Write(GameBaseAddress + 0x2539D, ref InfAmmoOn); // gun
+            GameMemory.Write(GameBaseAddress + 0x254C7, ref InfAmmoOn); // nades
+            GameMemory.Write(GameBaseAddress + 0x24C31, ref InfAmmoOn); // blocks
         }
 
         byte[] RapidfireGunOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
@@ -247,6 +248,8 @@ namespace trainer
                     GameMemory.WriteU32(GameBaseAddress + 0x21FD4, NadeRangePtr);
 
                     Options["SuperNadeRange"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+
+                    System.Console.Beep();
                 }
             }
         }
@@ -299,50 +302,15 @@ namespace trainer
             GameMemory.Write(GameBaseAddress + 0x23A8A, ref MultiJumpOn);
         }
 
-        // TODO: replace this patch with something less retarded later
-        byte[] ForceBlockDestructionSwitch = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
-        };
-        object MegaDestructionLock = new object();
-        bool MegaDestructionDone = false;
-        /// <summary>
-        /// this causes the client to crash when playing online pretty frequently,
-        /// maybe due to undeletable blocks being deleted from the huge areas being modified
-        /// </summary>
-        private void MegaDestruction_HotkeyPressed()
+        object ExtendRangeLock = new object();
+        bool ExtendRangeDone = false;
+        private void ExtendRange_HotkeyPressed()
         {
-            lock (MegaDestructionLock)
+            lock (ExtendRangeLock)
             {
-                if (!MegaDestructionDone)
+                if (!ExtendRangeDone)
                 {
-                    MegaDestructionDone = true;
-                    // this forces the block destruction to use the grenade style (big ass chunk)
-                    GameMemory.Write(GameBaseAddress + 0x25FF3, ref ForceBlockDestructionSwitch);
-
-                    // adjust the dimensions of the chunk destroyed (default is 2x2x2)
-                    GameMemory.WriteU8(GameBaseAddress + 0x199F3, 15);
-                    GameMemory.WriteU8(GameBaseAddress + 0x19A1A, 15);
-                    GameMemory.WriteU8(GameBaseAddress + 0x19A4A, 15);
-
-                    Options["MegaDestruction"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
-                }
-            }
-        }
-        object LongRangePickAxeLock = new object();
-        bool LongRangePickAxeDone = false;
-        private void LongRangePickAxe_HotkeyPressed()
-        {
-            lock (LongRangePickAxeLock)
-            {
-                if (!LongRangePickAxeDone)
-                {
-                    LongRangePickAxeDone = true;
+                    ExtendRangeDone = true;
                     // set the range for pickaxe to 32000, -32000 (was 3, -3)
                     uint PickRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x2486A);
                     PickRangeUpperBoundPtr -= 0xCC;
@@ -352,11 +320,78 @@ namespace trainer
                     PickRangeLowerBoundPtr -= 0xD8;
                     GameMemory.WriteU32(GameBaseAddress + 0x24881, PickRangeLowerBoundPtr);
 
-                    Options["LongRangePickAxe"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+                    // set the range for shovel to 32000, -32000 (was 3, -3)
+                    uint ShovelRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x245D8);
+                    ShovelRangeUpperBoundPtr -= 0xCC;
+                    GameMemory.WriteU32(GameBaseAddress + 0x245D8, ShovelRangeUpperBoundPtr);
+
+                    uint ShovelRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x245EF);
+                    ShovelRangeLowerBoundPtr -= 0xD8;
+                    GameMemory.WriteU32(GameBaseAddress + 0x245EF, ShovelRangeLowerBoundPtr);
+
+
+                    // set the range for block laying to 32000, -32000 (was 3, -3)
+                    uint BlockRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24AB9);
+                    BlockRangeUpperBoundPtr -= 0xCC;
+                    GameMemory.WriteU32(GameBaseAddress + 0x24AB9, BlockRangeUpperBoundPtr);
+
+                    uint BlockRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24AD0);
+                    BlockRangeLowerBoundPtr -= 0xD8;
+                    GameMemory.WriteU32(GameBaseAddress + 0x24AD0, BlockRangeLowerBoundPtr);
+
+                    Options["ExtendRange"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+
+                    System.Console.Beep();
                 }
             }
         }
 
+
+        // TODO: replace this patch with something less retarded later
+        /*
+        byte[] ForceBlockDestructionSwitch = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
+        };*/
+        byte[] RapidOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+        object RapidBuildDestroyLock = new object();
+        bool RapidBuildDestroyDone = false;
+        /// <summary>
+        /// this causes the client to crash when playing online pretty frequently,
+        /// maybe due to undeletable blocks being deleted from the huge areas being modified
+        /// </summary>
+        private void RapidBuildDestroy_HotkeyPressed()
+        {
+            lock (RapidBuildDestroyLock)
+            {
+                if (!RapidBuildDestroyDone)
+                {
+                    RapidBuildDestroyDone = true;
+
+                    GameMemory.WriteU8(GameBaseAddress + 0x2454C, 0xEB); // rapid shovel
+                    GameMemory.Write(GameBaseAddress + 0x2471A, ref RapidOn); // rapid pickaxe
+                    GameMemory.Write(GameBaseAddress + 0x24C4F, ref RapidOn); // rapid block laying
+
+
+                    // this forces the block destruction to use the grenade style (big ass chunk)
+                    //GameMemory.Write(GameBaseAddress + 0x25FF3, ref ForceBlockDestructionSwitch);
+
+                    // adjust the dimensions of the chunk destroyed (default is 2x2x2)
+                    //GameMemory.WriteU8(GameBaseAddress + 0x199F3, 15);
+                    //GameMemory.WriteU8(GameBaseAddress + 0x19A1A, 15);
+                    //GameMemory.WriteU8(GameBaseAddress + 0x19A4A, 15);
+
+                    Options["RapidBuildDestroy"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
+
+                    System.Console.Beep();
+                }
+            }
+        }
 
 #endregion
 
@@ -378,8 +413,8 @@ namespace trainer
                 TrainerOption SuperNadeRange = new TrainerOption(Keys.F10, SuperNadeRange_HotkeyPressed, windowHandle);
                 TrainerOption EnableAll = new TrainerOption(Keys.F11, EnableAll_HotkeyPressed, windowHandle);
 
-                TrainerOption MegaDestruction = new TrainerOption(Keys.Add, MegaDestruction_HotkeyPressed, windowHandle);
-                TrainerOption LongRangePickAxe = new TrainerOption(Keys.Subtract, LongRangePickAxe_HotkeyPressed, windowHandle);
+                TrainerOption ExtendRange = new TrainerOption(Keys.Add, ExtendRange_HotkeyPressed, windowHandle);
+                TrainerOption RapidBuildDestroy = new TrainerOption(Keys.Subtract, RapidBuildDestroy_HotkeyPressed, windowHandle);
 
                 TrainerOption NadeSpam = new TrainerOption(Keys.Z, NadeSpammer, windowHandle);
                 
@@ -396,8 +431,8 @@ namespace trainer
                 Options.Add("SuperNadeRange", SuperNadeRange);
                 Options.Add("EnableAll", EnableAll);
                 Options.Add("NadeSpam", NadeSpam);
-                Options.Add("MegaDestruction", MegaDestruction);
-                Options.Add("LongRangePickAxe", LongRangePickAxe);
+                Options.Add("ExtendRange", ExtendRange);
+                Options.Add("RapidBuildDestroy", RapidBuildDestroy);
             });
         }
 
