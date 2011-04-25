@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Gibbed.DwarfFortress.Utilities
+namespace trainer
 {
 	/// <summary>
 	/// Raised when the pattern given to a ByteSearch is invalid.

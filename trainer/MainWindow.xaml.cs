@@ -129,53 +129,46 @@ namespace trainer
 
 #region Trainer Hotkey Event Handlers
         byte[] GodModeOn = new byte[] { 0x90, 0x90, 0x90, 0x90 };
-        byte[] GodModeOff = new byte[] { 0x2B, 0x44, 0x24, 0x10 };
         private void GodMode_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x23DE5, ref GodModeOn);
+            GameMemory.Write(GameBaseAddress + 0x23D35, ref GodModeOn);
         }
 
         byte[] InfAmmoOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-        byte[] InfAmmoGunOff = new byte[] { 0xFF, 0x0D, 0xA4, 0xBC, 0x50, 0x03 };
-        byte[] InfAmmoNadesOff = new byte[] { };
-        byte[] InfAmmoBlocksOff = new byte[] { };
         private void InfAmmo_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x2539D, ref InfAmmoOn); // gun
-            GameMemory.Write(GameBaseAddress + 0x254C7, ref InfAmmoOn); // nades
-            GameMemory.Write(GameBaseAddress + 0x24C31, ref InfAmmoOn); // blocks
+            GameMemory.Write(GameBaseAddress + 0x25379, ref InfAmmoOn); // gun
+            GameMemory.Write(GameBaseAddress + 0x254A3, ref InfAmmoOn); // nades
+            GameMemory.Write(GameBaseAddress + 0x24B81, ref InfAmmoOn); // blocks
         }
 
         byte[] RapidfireGunOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-        byte[] RapidfireGunOff = new byte[] { 0x0F, 0x8E, 0x54, 0x07, 0x00, 0x00 };
         private void RapidfireGun_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x24C60, ref RapidfireGunOn);
+            GameMemory.Write(GameBaseAddress + 0x24BB0, ref RapidfireGunOn);
         }
 
-        byte[] NoRecoilOn = new byte[] { 0xE9, 0x37, 0x06, 0x00, 0x00, 0x90 };
-        byte[] NoRecoilOff = new byte[] { 0x0F, 0x85, 0x36, 0x06, 0x00, 0x00 };
+        byte[] NoRecoilOn = new byte[] { 0xE9, 0x2D, 0x06, 0x00, 0x00, 0x90 };
         private void NoRecoil_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x252BE, ref NoRecoilOn);
+            GameMemory.Write(GameBaseAddress + 0x2529a, ref NoRecoilOn);
         }
 
         // wip
         //byte[] RapidfireNadesOn1 = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         //byte[] RapidfireNadesOff1 = new byte[] { 0x0F, 0x85, 0x94, 0x00, 0x00, 0x00 };
 
-        byte[] RapidfireNadesOn1 = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-        byte[] RapidfireNadesOff1 = new byte[] { 0x89, 0x0D, 0x9C, 0xBC, 0x7D, 0x03 };
+        byte[] RapidfireNadesOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         private void RapidfireNades_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x254D3, ref RapidfireNadesOn1);
+            GameMemory.Write(GameBaseAddress + 0x254AF, ref RapidfireNadesOn);
         }
 
         byte[] NoFogOn = new byte[1024];
         byte[] NoFogOff = new byte[1024];
         private void NoFog_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x628D0, ref NoFogOn);
+            GameMemory.Write(GameBaseAddress + 0x638D0, ref NoFogOn);
         }
 
         //const double DefaultMovementAccel = 0.1000000014901161;
@@ -192,9 +185,9 @@ namespace trainer
                 {
                     SpeedHackDone = true;
                     // read orig speed value offset
-                    uint SpeedPtr = GameMemory.ReadU32(GameBaseAddress + 0x23FBA);
-                    SpeedPtr += 0x198;
-                    GameMemory.WriteU32(GameBaseAddress + 0x23FBa, SpeedPtr);
+                    uint SpeedPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F0A);
+                    SpeedPtr += 0x188;
+                    GameMemory.WriteU32(GameBaseAddress + 0x23F0A, SpeedPtr);
 
                     Options["Speedhack"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
                 }
@@ -203,12 +196,6 @@ namespace trainer
 
         //const float DefaultJumpHeight = -0.32f;
         //const float MegaJumpHeight = -0.9f;
-        // jump height patch
-        //byte[] MegaJumpOn = new byte[] { 0xD9, 0x05, 0xF0, 0x83, 0x31, 0x01 };
-        //byte[] MegaJumpOff = new byte[] { 0xD9, 0x05, 0x40, 0x85, 0x31, 0x01 };
-        // jump steering patch
-        //byte[] MegaJumpSteeringOn = new byte[] { 0xDC, 0x0D, 0x20, 0x84, 0x31, 0x01 };
-        //byte[] MegaJumpSteeringOff = new byte[] { 0xDC, 0x0D, 0x48, 0x84, 0x31, 0x01 };
         object MegaJumpLock = new object();
         bool MegaJumpDone = false;
         private void MegaJump_HotkeyPressed()
@@ -220,13 +207,13 @@ namespace trainer
                     MegaJumpDone = true;
 
                     //GameMemory.Write(GameBaseAddress + 0x23F26, ref MegaJumpOn);
-                    uint JumpHeightPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F28);
-                    JumpHeightPtr -= 0x150;
-                    GameMemory.WriteU32(GameBaseAddress + 0x23F28, JumpHeightPtr);
+                    uint JumpHeightPtr = GameMemory.ReadU32(GameBaseAddress + 0x23E78);
+                    JumpHeightPtr -= 0x1D4;
+                    GameMemory.WriteU32(GameBaseAddress + 0x23E78, JumpHeightPtr);
                     //GameMemory.Write(GameBaseAddress + 0x23F90, ref MegaJumpSteeringOn);
-                    uint JumpSteeringPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F92);
-                    JumpSteeringPtr -= 0x28;
-                    GameMemory.WriteU32(GameBaseAddress + 0x23F92, JumpSteeringPtr);
+                    uint JumpSteeringPtr = GameMemory.ReadU32(GameBaseAddress + 0x23EE2);
+                    JumpSteeringPtr -= 0x118;
+                    GameMemory.WriteU32(GameBaseAddress + 0x23EE2, JumpSteeringPtr);
 
                     Options["Megajump"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
                 }
@@ -243,9 +230,9 @@ namespace trainer
                 {
                     SuperNadeRangeDone = true;
                     // read orig speed value offset
-                    uint NadeRangePtr = GameMemory.ReadU32(GameBaseAddress + 0x21FD4);
+                    uint NadeRangePtr = GameMemory.ReadU32(GameBaseAddress + 0x21F64);
                     NadeRangePtr += 0xB0;
-                    GameMemory.WriteU32(GameBaseAddress + 0x21FD4, NadeRangePtr);
+                    GameMemory.WriteU32(GameBaseAddress + 0x21F64, NadeRangePtr);
 
                     Options["SuperNadeRange"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
 
@@ -296,10 +283,9 @@ namespace trainer
         }
 
         byte[] MultiJumpOn = new byte[] { 0x90, 0x90 };
-        byte[] MultiJumpOff = new byte[] { 0x75, 0x0F };
         private void MultiJump_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x23A8A, ref MultiJumpOn);
+            GameMemory.Write(GameBaseAddress + 0x23A0a, ref MultiJumpOn);
         }
 
         object ExtendRangeLock = new object();
@@ -312,32 +298,32 @@ namespace trainer
                 {
                     ExtendRangeDone = true;
                     // set the range for pickaxe to 32000, -32000 (was 3, -3)
-                    uint PickRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x2486A);
-                    PickRangeUpperBoundPtr -= 0xCC;
-                    GameMemory.WriteU32(GameBaseAddress + 0x2486A, PickRangeUpperBoundPtr);
+                    uint PickRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x247BA);
+                    PickRangeUpperBoundPtr -= 0xBC;
+                    GameMemory.WriteU32(GameBaseAddress + 0x247BA, PickRangeUpperBoundPtr);
 
-                    uint PickRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24881);
-                    PickRangeLowerBoundPtr -= 0xD8;
-                    GameMemory.WriteU32(GameBaseAddress + 0x24881, PickRangeLowerBoundPtr);
+                    uint PickRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x247D1);
+                    PickRangeLowerBoundPtr -= 0xC8;
+                    GameMemory.WriteU32(GameBaseAddress + 0x247D1, PickRangeLowerBoundPtr);
 
                     // set the range for shovel to 32000, -32000 (was 3, -3)
-                    uint ShovelRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x245D8);
-                    ShovelRangeUpperBoundPtr -= 0xCC;
-                    GameMemory.WriteU32(GameBaseAddress + 0x245D8, ShovelRangeUpperBoundPtr);
+                    uint ShovelRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24528);
+                    ShovelRangeUpperBoundPtr -= 0xBC;
+                    GameMemory.WriteU32(GameBaseAddress + 0x24528, ShovelRangeUpperBoundPtr);
 
-                    uint ShovelRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x245EF);
-                    ShovelRangeLowerBoundPtr -= 0xD8;
-                    GameMemory.WriteU32(GameBaseAddress + 0x245EF, ShovelRangeLowerBoundPtr);
+                    uint ShovelRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x2453F);
+                    ShovelRangeLowerBoundPtr -= 0xC8;
+                    GameMemory.WriteU32(GameBaseAddress + 0x2453F, ShovelRangeLowerBoundPtr);
 
 
                     // set the range for block laying to 32000, -32000 (was 3, -3)
-                    uint BlockRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24AB9);
-                    BlockRangeUpperBoundPtr -= 0xCC;
-                    GameMemory.WriteU32(GameBaseAddress + 0x24AB9, BlockRangeUpperBoundPtr);
+                    uint BlockRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24A09);
+                    BlockRangeUpperBoundPtr -= 0xBC;
+                    GameMemory.WriteU32(GameBaseAddress + 0x24A09, BlockRangeUpperBoundPtr);
 
-                    uint BlockRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24AD0);
-                    BlockRangeLowerBoundPtr -= 0xD8;
-                    GameMemory.WriteU32(GameBaseAddress + 0x24AD0, BlockRangeLowerBoundPtr);
+                    uint BlockRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24A20);
+                    BlockRangeLowerBoundPtr -= 0xC8;
+                    GameMemory.WriteU32(GameBaseAddress + 0x24A20, BlockRangeLowerBoundPtr);
 
                     Options["ExtendRange"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
 
@@ -347,24 +333,9 @@ namespace trainer
         }
 
 
-        // TODO: replace this patch with something less retarded later
-        /*
-        byte[] ForceBlockDestructionSwitch = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
-        };*/
         byte[] RapidOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         object RapidBuildDestroyLock = new object();
         bool RapidBuildDestroyDone = false;
-        /// <summary>
-        /// this causes the client to crash when playing online pretty frequently,
-        /// maybe due to undeletable blocks being deleted from the huge areas being modified
-        /// </summary>
         private void RapidBuildDestroy_HotkeyPressed()
         {
             lock (RapidBuildDestroyLock)
@@ -373,18 +344,9 @@ namespace trainer
                 {
                     RapidBuildDestroyDone = true;
 
-                    GameMemory.WriteU8(GameBaseAddress + 0x2454C, 0xEB); // rapid shovel
-                    GameMemory.Write(GameBaseAddress + 0x2471A, ref RapidOn); // rapid pickaxe
-                    GameMemory.Write(GameBaseAddress + 0x24C4F, ref RapidOn); // rapid block laying
-
-
-                    // this forces the block destruction to use the grenade style (big ass chunk)
-                    //GameMemory.Write(GameBaseAddress + 0x25FF3, ref ForceBlockDestructionSwitch);
-
-                    // adjust the dimensions of the chunk destroyed (default is 2x2x2)
-                    //GameMemory.WriteU8(GameBaseAddress + 0x199F3, 15);
-                    //GameMemory.WriteU8(GameBaseAddress + 0x19A1A, 15);
-                    //GameMemory.WriteU8(GameBaseAddress + 0x19A4A, 15);
+                    GameMemory.WriteU8(GameBaseAddress + 0x2449c, 0xEB); // rapid shovel
+                    GameMemory.Write(GameBaseAddress + 0x2466A, ref RapidOn); // rapid pickaxe
+                    GameMemory.Write(GameBaseAddress + 0x24B9F, ref RapidOn); // rapid block laying
 
                     Options["RapidBuildDestroy"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
 
