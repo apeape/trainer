@@ -157,8 +157,8 @@
             f9  - multi jump<LineBreak/>
             f10 - super nade distance<LineBreak/>
             f11 - enable all above except super nade distance<LineBreak/>
-            + key - extend spade/pickaxe/block range<LineBreak/>
-            - key - rapid construction/destruction
+            1 - extend spade/pickaxe/block range<LineBreak/>
+            2 - rapid construction/destruction
         </TextBlock>
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Bottom" 
                    Foreground="White" TextWrapping="Wrap"

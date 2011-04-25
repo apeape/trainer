@@ -375,8 +375,8 @@ namespace trainer
                 TrainerOption SuperNadeRange = new TrainerOption(Keys.F10, SuperNadeRange_HotkeyPressed, windowHandle);
                 TrainerOption EnableAll = new TrainerOption(Keys.F11, EnableAll_HotkeyPressed, windowHandle);
 
-                TrainerOption ExtendRange = new TrainerOption(Keys.Add, ExtendRange_HotkeyPressed, windowHandle);
-                TrainerOption RapidBuildDestroy = new TrainerOption(Keys.Subtract, RapidBuildDestroy_HotkeyPressed, windowHandle);
+                TrainerOption ExtendRange = new TrainerOption(Keys.D1, ExtendRange_HotkeyPressed, windowHandle);
+                TrainerOption RapidBuildDestroy = new TrainerOption(Keys.D2, RapidBuildDestroy_HotkeyPressed, windowHandle);
 
                 TrainerOption NadeSpam = new TrainerOption(Keys.Z, NadeSpammer, windowHandle);
                 
