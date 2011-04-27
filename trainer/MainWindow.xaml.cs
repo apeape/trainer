@@ -263,7 +263,7 @@ namespace trainer
                     if (JumpSteeringAddress != 0)
                     {
                         // write our new speed value first
-                        const double MegaJumpSteering = 0.9f;
+                        const double MegaJumpSteering = 3.0f;
                         GameMemory.WriteF64(GameBaseAddress + JumpSteeringOffset, MegaJumpSteering);
                         // now change the code to point to it
                         GameMemory.WriteU32(JumpSteeringAddress, GameBaseAddress + JumpSteeringOffset);
