@@ -1,7 +1,7 @@
 ﻿<Window x:Class="trainer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ace of spades 0.33 trainer" Height="340" Width="350"
+        Title="ace of spades 0.35 trainer" Height="360" Width="350"
         Loaded="Window_Loaded" Closing="Window_Closing"
         Icon="/trainer;component/Peggle.ico" ResizeMode="CanMinimize"
         xmlns:local="clr-namespace:trainer">
@@ -153,12 +153,15 @@
             f5  - rapid fire nades*<LineBreak/>
             f6  - no fog<LineBreak/>
             f7  - speed hack**<LineBreak/>
-            f8  - mega jump<LineBreak/>
+            f8  - mega jump<LineBreak/><LineBreak/>
             f9  - multi jump<LineBreak/>
-            f10 - super nade distance<LineBreak/>
-            f11 - enable all above except super nade distance<LineBreak/>
+            
+            f10 - enable all above<LineBreak/>
+            
             1 - extend spade/pickaxe/block range<LineBreak/>
-            2 - rapid construction/destruction
+            2 - rapid construction/destruction<LineBreak/>
+            
+            5 - super nade distance<LineBreak/>
         </TextBlock>
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Bottom" 
                    Foreground="White" TextWrapping="Wrap"
@@ -181,6 +184,6 @@
                Stretch="None" MouseLeftButtonUp="Mute_MouseLeftButtonUp"
                VerticalAlignment="Top" HorizontalAlignment="Right"
                Width="40" Height="40" />
-
+        <Slider Height="13" HorizontalAlignment="Left" Margin="23,161,0,0" Name="megajumpSlider" VerticalAlignment="Top" Width="100" Value="-1" Maximum="-0.3" Minimum="-4" IsDirectionReversed="True" ValueChanged="megajumpSlider_ValueChanged" />
     </Grid>
 </Window>

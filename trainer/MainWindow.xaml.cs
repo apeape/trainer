@@ -28,12 +28,26 @@ namespace trainer
     {
         public Dictionary<string, TrainerOption> Options = new Dictionary<string, TrainerOption>();
         //List<TrainerOption> Options = new List<TrainerOption>();
+        const string GameProcessName = "client";
+        const string GameWindowCaption = "Ace of Spades";
+        Process GameProcess;
         ProcessMemory GameMemory = new ProcessMemory();
+        SigScan GameMemoryScanner;
         bool GameProcessFound = false;
         bool TrainerExiting = false;
         uint GameBaseAddress;
         Thread FindGameWindow;
         MouseSimulator Mouse = new MouseSimulator();
+        const int MemorySearchRegionSize = 0x40000;
+
+        // memory offsets to store our new values for misc stuff at
+        const int SpeedHackOffset = 0x1030;
+        const int JumpHeightOffset = SpeedHackOffset + 0x10;
+        const int JumpSteeringOffset = JumpHeightOffset + 0x10;
+        const int NadeRangeOffset = JumpSteeringOffset + 0x10;
+        const int ToolRangeMinOffset = NadeRangeOffset + 0x10;
+        const int ToolRangeMaxOffset = ToolRangeMinOffset + 0x10;
+
 
         public MainWindow()
         {
@@ -47,9 +61,9 @@ namespace trainer
             FindGameWindow.Name = "Find Game Window";
             FindGameWindow.Start();
 
-            // give the thread a second to check for the game window before we do anything stupid
-            Thread.Sleep(100);
-            if (!GameProcessFound)
+            // check for game window once before proceeding
+            GameProcess = LocateGameWindow();
+            if (GameProcess == null)
             {
                 // play chiptune
                 BassMOD.BASSMOD_Init(-1, 441000, BASSInit.BASS_DEVICE_DEFAULT);
@@ -76,50 +90,54 @@ namespace trainer
                 FindGameWindow.Abort();
         }
 
+        private Process LocateGameWindow()
+        {
+            return Process.GetProcessesByName(GameProcessName)
+                .SingleOrDefault(proc => proc.MainWindowTitle == GameWindowCaption);
+        }
+
         /// <summary>
         /// This thread waits for the game window, then stops music/animation and enables the trainer hotkeys
         /// </summary>
         private void TrainerLoop()
         {
-            Process gameProcess;
-
             try
             {
+                // wait for the game window
                 while (!GameProcessFound && !TrainerExiting)
                 {
-                    // find game window
-                    gameProcess = Process.GetProcessesByName("client")
-                        .SingleOrDefault(proc => proc.MainWindowTitle == "Ace of Spades");
-                    if (gameProcess != null)
-                    {
-                        GameBaseAddress = (uint)gameProcess.MainModule.BaseAddress;
-
-                        // WPF quirks ftw, we have to run this on the thread which owns the window
-                        this.Dispatcher.BeginInvoke((ThreadStart)delegate()
-                        {
-                            this.Title = this.Title + " - game found!";
-                        });
-
-                        // stop music and wpf animations
-
-                        // sometimes this doesnt stop correctly
-                        BassMOD.BASSMOD_MusicStop();
-                        BassMOD.BASSMOD_MusicStop();
-                        BassMOD.BASSMOD_MusicStop();
-                        ((Storyboard)this.Resources["LogoZoom"]).Stop();
-                        ((Storyboard)this.Resources["LogoRotate"]).Stop();
-                        ((Storyboard)this.Resources["BackgroundRotate"]).Stop();
-
-                        GameMemory.Open(gameProcess);
-
-                        // enable all option hotkeys
-                        SetupOptions();
-
-                        GameProcessFound = true;
-                        break;
-                    }
-                    else
+                    GameProcess = LocateGameWindow();
+                    if (GameProcess == null)
                         Thread.Sleep(1000);
+                    else
+                        GameProcessFound = true;
+                }
+
+                if (GameProcessFound)
+                {
+                    // found the process, proceed
+                    GameBaseAddress = (uint)GameProcess.MainModule.BaseAddress;
+
+                    // WPF quirks ftw, we have to run this on the thread which owns the window
+                    this.Dispatcher.BeginInvoke((ThreadStart)delegate()
+                    {
+                        this.Title = this.Title + " - game found!";
+                    });
+
+                    // stop music and wpf animations
+
+                    // sometimes this doesnt stop correctly, needs investigation
+                    BassMOD.BASSMOD_MusicStop();
+                    ((Storyboard)this.Resources["LogoZoom"]).Stop();
+                    ((Storyboard)this.Resources["LogoRotate"]).Stop();
+                    ((Storyboard)this.Resources["BackgroundRotate"]).Stop();
+
+                    GameMemory.Open(GameProcess);
+
+                    GameMemoryScanner = new SigScan(GameProcess, (IntPtr)GameBaseAddress, MemorySearchRegionSize);
+
+                    // enable all option hotkeys
+                    SetupOptions();
                 }
             }
             catch (ThreadInterruptedException)
@@ -131,50 +149,66 @@ namespace trainer
         byte[] GodModeOn = new byte[] { 0x90, 0x90, 0x90, 0x90 };
         private void GodMode_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x23D35, ref GodModeOn);
+            // locate address from pattern
+            uint GodModeAddress = GameMemoryScanner.FindPattern("2B 44 24 10 A3", 0);
+            if (GodModeAddress != 0)
+                GameMemory.Write(GodModeAddress, ref GodModeOn);
         }
 
         byte[] InfAmmoOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         private void InfAmmo_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x25379, ref InfAmmoOn); // gun
-            GameMemory.Write(GameBaseAddress + 0x254A3, ref InfAmmoOn); // nades
-            GameMemory.Write(GameBaseAddress + 0x24B81, ref InfAmmoOn); // blocks
+            // locate address from pattern
+            uint InfAmmoGunAddress = GameMemoryScanner.FindPattern("D9 5C 24 18 FF 0D", 4);
+            if (InfAmmoGunAddress != 0)
+                GameMemory.Write((uint)InfAmmoGunAddress, ref InfAmmoOn); // gun
+            // locate address from pattern
+            uint InfAmmoNadesAddress = GameMemoryScanner.FindPattern("83 C4 04 FF 0D ?? ?? ?? ?? 8D", 3);
+            if (InfAmmoGunAddress != 0)
+                GameMemory.Write((uint)InfAmmoNadesAddress, ref InfAmmoOn); // nades
+            // locate address from pattern
+            uint InfAmmoBlocksAddress = GameMemoryScanner.FindPattern("83 C4 04 FF 0D ?? ?? ?? ?? 75 0A", 3);
+            if (InfAmmoGunAddress != 0)
+                GameMemory.Write((uint)InfAmmoBlocksAddress, ref InfAmmoOn); // blocks
         }
 
         byte[] RapidfireGunOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         private void RapidfireGun_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x24BB0, ref RapidfireGunOn);
+            uint RapidfireGunAddress = GameMemoryScanner.FindPattern("3B 95 ?? ?? ?? ?? 0F 8E E0", 6);
+            if (RapidfireGunAddress != 0)
+                GameMemory.Write((uint)RapidfireGunAddress, ref RapidfireGunOn);
         }
 
-        byte[] NoRecoilOn = new byte[] { 0xE9, 0x2D, 0x06, 0x00, 0x00, 0x90 };
+        byte[] NoRecoilOn = new byte[] { 0x33, 0xC0, 0x90, 0x90, 0x90 };
         private void NoRecoil_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x2529a, ref NoRecoilOn);
+            uint NoRecoilAddress = GameMemoryScanner.FindPattern("A1 ?? ?? ?? ?? 39 44 24 14 0F 85", 0);
+            if (NoRecoilAddress != 0)
+                GameMemory.Write((uint)NoRecoilAddress, ref NoRecoilOn);
         }
-
-        // wip
-        //byte[] RapidfireNadesOn1 = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-        //byte[] RapidfireNadesOff1 = new byte[] { 0x0F, 0x85, 0x94, 0x00, 0x00, 0x00 };
 
         byte[] RapidfireNadesOn = new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
         private void RapidfireNades_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x254AF, ref RapidfireNadesOn);
+            uint RapidfireNadesAddress = GameMemoryScanner.FindPattern("89 0D ?? ?? ?? ?? 75 0A", 0);
+            if (RapidfireNadesAddress != 0)
+                GameMemory.Write((uint)RapidfireNadesAddress, ref RapidfireNadesOn);
         }
 
         byte[] NoFogOn = new byte[1024];
-        byte[] NoFogOff = new byte[1024];
         private void NoFog_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x638D0, ref NoFogOn);
+            uint FogLUTRefAddress = GameMemoryScanner.FindPattern("B9 FF 07 00 00 3D FF 07 00 00 7F 02 8B C8", 17);
+            if (FogLUTRefAddress != 0)
+            {
+                // read the ptr for the fog LUT
+                uint FogLUTAddress = GameMemory.ReadU32((uint)FogLUTRefAddress);
+                // fill the LUT with zeroes
+                GameMemory.Write(FogLUTAddress, ref NoFogOn);
+            }
         }
 
-        //const double DefaultMovementAccel = 0.1000000014901161;
-        //const double SpeedHackAccel = 0.9;
-        //byte[] SpeedHackOn = new byte[] { 0xDC, 0x0D, 0x88, 0x84, 0x31, 0x01 };
-        //byte[] SpeedHackOff = new byte[] { 0xDC, 0x0D, 0xF0, 0x82, 0x31, 0x01 };
         object SpeedHackLock = new object();
         bool SpeedHackDone = false;
         private void SpeedHack_HotkeyPressed()
@@ -184,18 +218,23 @@ namespace trainer
                 if (!SpeedHackDone)
                 {
                     SpeedHackDone = true;
-                    // read orig speed value offset
-                    uint SpeedPtr = GameMemory.ReadU32(GameBaseAddress + 0x23F0A);
-                    SpeedPtr += 0x188;
-                    GameMemory.WriteU32(GameBaseAddress + 0x23F0A, SpeedPtr);
+
+                    // locate address from pattern
+                    uint SpeedHackAddress = GameMemoryScanner.FindPattern("EB 12 39 9D ?? ?? ?? ?? 74 0E D9 44 24 10 DC 0D", 16);
+                    if (SpeedHackAddress != 0)
+                    {
+                        // write our new speed value first
+                        const double NewSpeed = 2.5f;
+                        GameMemory.WriteF64(GameBaseAddress + SpeedHackOffset, NewSpeed);
+                        // now change the code to point to it
+                        GameMemory.WriteU32(SpeedHackAddress, GameBaseAddress + SpeedHackOffset);
+                    }
 
                     Options["Speedhack"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
                 }
             }
         }
 
-        //const float DefaultJumpHeight = -0.32f;
-        //const float MegaJumpHeight = -0.9f;
         object MegaJumpLock = new object();
         bool MegaJumpDone = false;
         private void MegaJump_HotkeyPressed()
@@ -206,14 +245,29 @@ namespace trainer
                 {
                     MegaJumpDone = true;
 
-                    //GameMemory.Write(GameBaseAddress + 0x23F26, ref MegaJumpOn);
-                    uint JumpHeightPtr = GameMemory.ReadU32(GameBaseAddress + 0x23E78);
-                    JumpHeightPtr -= 0x1D4;
-                    GameMemory.WriteU32(GameBaseAddress + 0x23E78, JumpHeightPtr);
-                    //GameMemory.Write(GameBaseAddress + 0x23F90, ref MegaJumpSteeringOn);
-                    uint JumpSteeringPtr = GameMemory.ReadU32(GameBaseAddress + 0x23EE2);
-                    JumpSteeringPtr -= 0x118;
-                    GameMemory.WriteU32(GameBaseAddress + 0x23EE2, JumpSteeringPtr);
+                    // jump height
+                    // locate address from pattern
+                    uint JumpHeightAddress = GameMemoryScanner.FindPattern("D9 05 ?? ?? ?? ?? 39", 2);
+                    if (JumpHeightAddress != 0)
+                    {
+                        // write our new speed value first
+                        //const float MegaJumpHeight = -0.8f;
+                        GameMemory.WriteF32(GameBaseAddress + JumpHeightOffset, (float)megajumpSlider.Value);
+                        // now change the code to point to it
+                        GameMemory.WriteU32(JumpHeightAddress, GameBaseAddress + JumpHeightOffset);
+                    }
+
+                    // jump steering
+                    // locate address from pattern
+                    uint JumpSteeringAddress = GameMemoryScanner.FindPattern("DC 0D ?? ?? ?? ?? EB 26", 2);
+                    if (JumpSteeringAddress != 0)
+                    {
+                        // write our new speed value first
+                        const double MegaJumpSteering = 0.9f;
+                        GameMemory.WriteF64(GameBaseAddress + JumpSteeringOffset, MegaJumpSteering);
+                        // now change the code to point to it
+                        GameMemory.WriteU32(JumpSteeringAddress, GameBaseAddress + JumpSteeringOffset);
+                    }
 
                     Options["Megajump"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
                 }
@@ -229,10 +283,17 @@ namespace trainer
                 if (!SuperNadeRangeDone)
                 {
                     SuperNadeRangeDone = true;
-                    // read orig speed value offset
-                    uint NadeRangePtr = GameMemory.ReadU32(GameBaseAddress + 0x21F64);
-                    NadeRangePtr += 0xB0;
-                    GameMemory.WriteU32(GameBaseAddress + 0x21F64, NadeRangePtr);
+
+                    // locate address from pattern
+                    uint NadeRangeAddress = GameMemoryScanner.FindPattern("DD 05 ?? ?? ?? ?? DC C9 D9 81", 2);
+                    if (NadeRangeAddress != 0)
+                    {
+                        // write our new speed value first
+                        const double SuperNadeRange = 8.0f;
+                        GameMemory.WriteF64(GameBaseAddress + NadeRangeOffset, SuperNadeRange);
+                        // now change the code to point to it
+                        GameMemory.WriteU32(NadeRangeAddress, GameBaseAddress + NadeRangeOffset);
+                    }
 
                     Options["SuperNadeRange"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
 
@@ -285,7 +346,9 @@ namespace trainer
         byte[] MultiJumpOn = new byte[] { 0x90, 0x90 };
         private void MultiJump_HotkeyPressed()
         {
-            GameMemory.Write(GameBaseAddress + 0x23A0a, ref MultiJumpOn);
+            uint MultiJumpAddress = GameMemoryScanner.FindPattern("75 ?? B9 01 00 00 00", 0);
+            if (MultiJumpAddress != 0)
+                GameMemory.Write((uint)MultiJumpAddress, ref MultiJumpOn);
         }
 
         object ExtendRangeLock = new object();
@@ -297,33 +360,54 @@ namespace trainer
                 if (!ExtendRangeDone)
                 {
                     ExtendRangeDone = true;
-                    // set the range for pickaxe to 32000, -32000 (was 3, -3)
-                    uint PickRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x247BA);
-                    PickRangeUpperBoundPtr -= 0xBC;
-                    GameMemory.WriteU32(GameBaseAddress + 0x247BA, PickRangeUpperBoundPtr);
 
-                    uint PickRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x247D1);
-                    PickRangeLowerBoundPtr -= 0xC8;
-                    GameMemory.WriteU32(GameBaseAddress + 0x247D1, PickRangeLowerBoundPtr);
+                    const float NewToolRangeMax = 32000f;
+                    const float NewToolRangeMin = -32000f;
 
-                    // set the range for shovel to 32000, -32000 (was 3, -3)
-                    uint ShovelRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24528);
-                    ShovelRangeUpperBoundPtr -= 0xBC;
-                    GameMemory.WriteU32(GameBaseAddress + 0x24528, ShovelRangeUpperBoundPtr);
+                    // write our new values first
+                    GameMemory.WriteF32(GameBaseAddress + ToolRangeMaxOffset, NewToolRangeMax);
+                    GameMemory.WriteF32(GameBaseAddress + ToolRangeMinOffset, NewToolRangeMin);
 
-                    uint ShovelRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x2453F);
-                    ShovelRangeLowerBoundPtr -= 0xC8;
-                    GameMemory.WriteU32(GameBaseAddress + 0x2453F, ShovelRangeLowerBoundPtr);
+                    // extend the range for pickaxe (was 3, -3)
+                    // locate address from pattern
+                    uint PickaxeUpperRangeAddress = GameMemoryScanner.FindPattern("D8 64 24 48 D9 5C 24 54", 10);
+                    if (PickaxeUpperRangeAddress != 0)
+                        // change the code to point to new value
+                        GameMemory.WriteU32(PickaxeUpperRangeAddress, GameBaseAddress + ToolRangeMaxOffset);
+
+                    // locate address from pattern
+                    uint PickaxeLowerRangeAddress = GameMemoryScanner.FindPattern("0F 8A 3C 01 00 00 D9 05", 8);
+                    if (PickaxeLowerRangeAddress != 0)
+                        // change the code to point to new value
+                        GameMemory.WriteU32(PickaxeLowerRangeAddress, GameBaseAddress + ToolRangeMinOffset);
 
 
-                    // set the range for block laying to 32000, -32000 (was 3, -3)
-                    uint BlockRangeUpperBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24A09);
-                    BlockRangeUpperBoundPtr -= 0xBC;
-                    GameMemory.WriteU32(GameBaseAddress + 0x24A09, BlockRangeUpperBoundPtr);
+                    // extend the range for shovel (was 3, -3)
+                    // locate address from pattern
+                    uint ShovelUpperRangeAddress = GameMemoryScanner.FindPattern("D9 5C 24 48 D9 05 ?? ?? ?? ?? D9 44 24 40 D8 D1", 6);
+                    if (ShovelUpperRangeAddress != 0)
+                        // change the code to point to new value
+                        GameMemory.WriteU32(ShovelUpperRangeAddress, GameBaseAddress + ToolRangeMaxOffset);
 
-                    uint BlockRangeLowerBoundPtr = GameMemory.ReadU32(GameBaseAddress + 0x24A20);
-                    BlockRangeLowerBoundPtr -= 0xC8;
-                    GameMemory.WriteU32(GameBaseAddress + 0x24A20, BlockRangeLowerBoundPtr);
+                    // locate address from pattern
+                    uint ShovelLowerRangeAddress = GameMemoryScanner.FindPattern("0F 8A 07 01 00 00 D9 05 ?? ?? ?? ?? D8 D1", 8);
+                    if (ShovelLowerRangeAddress != 0)
+                        // change the code to point to new value
+                        GameMemory.WriteU32(ShovelLowerRangeAddress, GameBaseAddress + ToolRangeMinOffset);
+
+
+                    // extend the range for block laying (was 3, -3)
+                    // locate address from pattern
+                    uint BlockUpperRangeAddress = GameMemoryScanner.FindPattern("D8 AD ?? ?? ?? ?? D9 5C 24 54 D9 05", 12);
+                    if (BlockUpperRangeAddress != 0)
+                        // change the code to point to new value
+                        GameMemory.WriteU32(BlockUpperRangeAddress, GameBaseAddress + ToolRangeMaxOffset);
+
+                    // locate address from pattern
+                    uint BlockLowerRangeAddress = GameMemoryScanner.FindPattern("F6 C4 05 0F 8A 08 0B 00 00 D9 05", 11);
+                    if (BlockLowerRangeAddress != 0)
+                        // change the code to point to new value
+                        GameMemory.WriteU32(BlockLowerRangeAddress, GameBaseAddress + ToolRangeMinOffset);
 
                     Options["ExtendRange"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
 
@@ -344,9 +428,18 @@ namespace trainer
                 {
                     RapidBuildDestroyDone = true;
 
-                    GameMemory.WriteU8(GameBaseAddress + 0x2449c, 0xEB); // rapid shovel
-                    GameMemory.Write(GameBaseAddress + 0x2466A, ref RapidOn); // rapid pickaxe
-                    GameMemory.Write(GameBaseAddress + 0x24B9F, ref RapidOn); // rapid block laying
+                    // locate address from pattern
+                    uint RapidShovelAddress = GameMemoryScanner.FindPattern("75 13 81 C2 E8 03 00 00", 0);
+                    if (RapidShovelAddress != 0)
+                        GameMemory.WriteU8(RapidShovelAddress, 0xEB);
+
+                    uint RapidPickaxeAddress = GameMemoryScanner.FindPattern("0F 8E 26 0D 00 00 81 C2 C8 00 00 00", 0);
+                    if (RapidPickaxeAddress != 0)
+                        GameMemory.Write(RapidPickaxeAddress, ref RapidOn);
+
+                    uint RapidBlockAddress = GameMemoryScanner.FindPattern("81 C2 F4 01 00 00 89 15", 6);
+                    if (RapidBlockAddress != 0)
+                        GameMemory.Write(RapidBlockAddress, ref RapidOn);
 
                     Options["RapidBuildDestroy"].Hotkey.UnregisterHotKey(); // disable this to avoid it running twice
 
@@ -372,11 +465,13 @@ namespace trainer
                 TrainerOption Speedhack = new TrainerOption(Keys.F7, SpeedHack_HotkeyPressed, windowHandle);
                 TrainerOption Megajump = new TrainerOption(Keys.F8, MegaJump_HotkeyPressed, windowHandle);
                 TrainerOption Multijump = new TrainerOption(Keys.F9, MultiJump_HotkeyPressed, windowHandle);
-                TrainerOption SuperNadeRange = new TrainerOption(Keys.F10, SuperNadeRange_HotkeyPressed, windowHandle);
-                TrainerOption EnableAll = new TrainerOption(Keys.F11, EnableAll_HotkeyPressed, windowHandle);
 
+                TrainerOption EnableAll = new TrainerOption(Keys.F10, EnableAll_HotkeyPressed, windowHandle);
+                
                 TrainerOption ExtendRange = new TrainerOption(Keys.D1, ExtendRange_HotkeyPressed, windowHandle);
                 TrainerOption RapidBuildDestroy = new TrainerOption(Keys.D2, RapidBuildDestroy_HotkeyPressed, windowHandle);
+
+                TrainerOption SuperNadeRange = new TrainerOption(Keys.D5, SuperNadeRange_HotkeyPressed, windowHandle);
 
                 TrainerOption NadeSpam = new TrainerOption(Keys.Z, NadeSpammer, windowHandle);
                 
@@ -421,10 +516,20 @@ namespace trainer
 
         private void Mute_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            // sometimes this doesnt stop correctly
             BassMOD.BASSMOD_MusicStop();
-            BassMOD.BASSMOD_MusicStop();
-            BassMOD.BASSMOD_MusicStop();
+        }
+
+        /// <summary>
+        /// allow the user to change the jump height after the option is enabled
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void megajumpSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (GameProcessFound)
+            {
+                GameMemory.WriteF32(GameBaseAddress + JumpHeightOffset, (float)megajumpSlider.Value);
+            }
         }
     }
 }
